@@ -17,6 +17,10 @@ github.com/mattn/go-colorable v0.1.12 h1:jF+Du6AlPIjs2BiUiQlKOX0rt3SujHxPnksPKZb
 github.com/mattn/go-colorable v0.1.12/go.mod h1:u5H1YNBxpqRaxsYJYSkiCWKzEfiAb1Gb520KVy5xxl4=
 github.com/mattn/go-isatty v0.0.14 h1:yVuAays6BHfxijgZPzw+3Zlu5yQgKGP2/hcQbHb7S9Y=
 github.com/mattn/go-isatty v0.0.14/go.mod h1:7GGIvUiUoEMVVmxf/4nioHXj79iQHKdU27kJ6hsGG94=
+github.com/pangeacyber/pangea-go/pangea-sdk v1.10.0 h1:r7htbn5m56+4J8d5ZquCoBD6eRf80LmFQ4mEZfu3ttA=
+github.com/pangeacyber/pangea-go/pangea-sdk v1.10.0/go.mod h1:TrRBjwbk83YhtHqCNsrMf//iz9yj/b3139mvts20qH0=
+github.com/pangeacyber/pangea-go/pangea-sdk/v2 v2.3.0 h1:s72iLPWawcKFh8GO5eP1qev5Zp/VPGavYaqZ3CS3JWw=
+github.com/pangeacyber/pangea-go/pangea-sdk/v2 v2.3.0/go.mod h1:VsuUoA8XBjZGMI8hu2UlWCBQau9enkisMdWr2AnxvqI=
 github.com/pangeacyber/pangea-go/pangea-sdk/v3 v3.0.0 h1:24yIYHJ8iYUwt74+O9WRewwAgSYDQj2i6Ngkq81Q7jY=
 github.com/pangeacyber/pangea-go/pangea-sdk/v3 v3.0.0/go.mod h1:Mza25gc1H5EwnRN3Qg3G8b192nOMQ8c+UOl0zhD+dGE=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

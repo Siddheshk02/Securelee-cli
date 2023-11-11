@@ -14,6 +14,8 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
+	github.com/pangeacyber/pangea-go/pangea-sdk v1.10.0
+	github.com/pangeacyber/pangea-go/pangea-sdk/v2 v2.3.0
 	github.com/rs/zerolog v1.29.1 // indirect
 	github.com/sendgrid/sendgrid-go v3.13.0+incompatible
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966 // indirect

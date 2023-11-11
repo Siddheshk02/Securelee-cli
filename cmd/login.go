@@ -4,42 +4,150 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
-	"net"
-	"net/http"
+	"os"
+	"os/user"
+	"time"
 
-	"github.com/Siddheshk02/Securelee-cli/controller"
-	"github.com/gorilla/mux"
-	"github.com/skratchdot/open-golang/open"
+	"github.com/Siddheshk02/Securelee-cli/lib"
+	"github.com/Siddheshk02/Securelee-cli/mailing"
+	"github.com/pangeacyber/pangea-go/pangea-sdk/v2/service/authn"
 	"github.com/spf13/cobra"
 )
 
-// loginCmd represents the login command
+// SignUpCmd represents the SignUp command
 var loginCmd = &cobra.Command{
 	Use:   "login",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Login to Securelee Vault.",
+	Long:  `Login to Securelee Vault.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// fmt.Println("login called")
-		r := mux.NewRouter()
 
-		r.HandleFunc("/login-success", controller.Callback).Methods("GET").Host("pdn-vehpksfu665ae7k5jewmycb4fxqircam.login.aws.us.pangea.cloud").Queries("state", "{state:[a-zA-Z0-9]+}")
-		l, err := net.Listen("tcp", ":80")
-		if err != nil {
-			log.Fatal(err)
+		res := lib.Check()
+		if res == true {
+			fmt.Println("Already logged in!")
+			os.Exit(0)
 		}
 
-		fmt.Print("\n> Press Enter to Sign up/Login : ")
-		fmt.Scanln(" ")
-		open.Start("https://pdn-vehpksfu665ae7k5jewmycb4fxqircam.login.aws.us.pangea.cloud/authorize?redirect_uri=%2Flogin-success&state=xxxxxxxxxxxxx")
+		var choice int
+		var token string
+		var result *authn.ClientTokenCheckResult
+		var ch, usertype string
+		fmt.Println(" Select any one option: ")
+		fmt.Println("\n> 1. Login using Socials through Browser")
+		fmt.Println("> 2. Login using Email and Password on the Terminal")
+		fmt.Println("")
+		fmt.Print("> Enter your choice (for e.g. 1): ")
+		fmt.Scanf("%d", &choice)
+		fmt.Println("")
+		if choice == 1 {
+			fmt.Print("\n> Press Enter to Login using Browser (You can get back to CLI after Successful Authentication) : ")
+			fmt.Scanf(" ")
+			lib.Login()
+			time.Sleep(10 * time.Second)
 
-		http.Serve(l, r)
+			fmt.Println("")
+			fmt.Print("> Please Enter the Token from the Securelee Authentication Tab: ")
+			fmt.Scan(&token)
+
+			result, ch = lib.CheckToken(token)
+			if ch != "" {
+				log.Fatal(ch)
+			}
+
+		} else if choice == 2 {
+			var email, password string
+			fmt.Print("> Enter your Email Address : ")
+			fmt.Scan(&email)
+			fmt.Println("")
+			fmt.Print("> Enter your Password : ")
+			fmt.Scan(&password)
+			fmt.Println("")
+
+			token, usertype, err := lib.LoginWithEmail(email, password)
+
+			if token == "" && usertype == "" && err != nil {
+				log.Fatalln(err.Error())
+			}
+
+			if token != "" {
+				result, ch = lib.CheckToken(token)
+				if ch != "" {
+					log.Fatal(ch)
+				}
+			}
+
+		} else {
+			fmt.Println(" Invalid Choice Entered!!, Please try again")
+			os.Exit(0)
+		}
+
+		parsedTime, err := time.Parse(time.RFC3339, result.Expire)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+
+		info := struct {
+			Token   string    `json:"token"`
+			Email   string    `json:"email"`
+			Name    string    `json:"name"`
+			User_ID string    `json:"userID"`
+			Expiry  time.Time `json:"expiry"`
+		}{
+			Token:   token,
+			Email:   result.Email,
+			Name:    result.Profile["first_name"] + " " + result.Profile["last_name"],
+			User_ID: result.ID,
+			Expiry:  parsedTime,
+		}
+
+		err = mailing.SendMail(info.Name, info.Email)
+		if err != nil {
+			log.Fatalln(err.Error())
+		}
+
+		if choice == 1 {
+			fmt.Println("\n> Successfully Logged in as ", info.Name, " (", info.Email, ")")
+		} else if choice == 2 {
+			if usertype == "Old User" {
+				fmt.Println("\n> Successfully Logged in as ", info.Name, " (", info.Email, ")")
+			} else if usertype == "New User" {
+				fmt.Println("\n> Successfully Created and Logged in as ", info.Name, " (", info.Email, ")")
+			}
+		}
+
+		currentUser, err := user.Current()
+		if err != nil {
+			log.Fatal("Error occured!, try again.")
+		}
+
+		path := currentUser.HomeDir + "/securelee"
+		err = os.MkdirAll(path, os.ModePerm)
+		if err != nil {
+			log.Fatal("Error occured!, try again.")
+		}
+
+		tokenPath := currentUser.HomeDir + "/Securelee/token.json"
+
+		data, err := json.Marshal(info)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+
+		file, err := os.Create(tokenPath)
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+		defer file.Close()
+
+		err = ioutil.WriteFile(file.Name(), []byte(data), 0644)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+
 	},
 }
 
@@ -50,9 +158,9 @@ func init() {
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// loginCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// SignUpCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// loginCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// SignUpCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

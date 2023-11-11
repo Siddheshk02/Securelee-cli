@@ -1,196 +1,228 @@
 package lib
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+	"os/user"
+	"path/filepath"
+	"time"
+
+	"github.com/pangeacyber/pangea-go/pangea-sdk/v2/service/authn"
+	"github.com/pangeacyber/pangea-go/pangea-sdk/v3/pangea"
 	"github.com/skratchdot/open-golang/open"
 )
 
-// var CB_URI = "http://localhost:8088/callback"
+func Login() {
+	open.Start("https://pdn-vehpksfu665ae7k5jewmycb4fxqircam.login.aws.us.pangea.cloud/authorize?state=xxxxxxxxxxxxx")
 
-func SignUp() {
-	open.Start("https://pdn-vehpksfu665ae7k5jewmycb4fxqircam.login.aws.us.pangea.cloud")
+	return
+}
+
+type TokenInfo struct {
+	Token   string    `json:"token"`
+	Email   string    `json:"email"`
+	Name    string    `json:"name"`
+	User_ID string    `json:"userID"`
+	Expiry  time.Time `json:"expiry"`
+}
+
+// Check Token for Current User
+func Check() bool {
+	user, err := user.Current()
+	if err != nil {
+		log.Fatal(err)
+	}
+	filePath := filepath.Join(user.HomeDir, "/securelee/token.json")
+
+	if !FileExists(filePath) {
+		file, err := ioutil.ReadFile(filePath)
+		if err != nil {
+			log.Fatal("Error while fetching the Token!!")
+		}
+
+		var token TokenInfo
+		err = json.Unmarshal(file, &token)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		//Check Token Expiry
+		if time.Now().After(token.Expiry) {
+			os.Remove(filePath)
+			return false
+		}
+
+		//Check Token is Valid or not
+		_, ch := CheckToken(token.Token)
+		if ch != "" {
+			return false
+		}
+
+		return true
+	}
+
+	return false
+}
+
+// Check Token Validity
+func CheckToken(token string) (*authn.ClientTokenCheckResult, string) {
+	ctx, cancelFn := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancelFn()
+	client := Init()
+
+	input := authn.ClientTokenCheckRequest{
+		Token: token,
+	}
+
+	resp, err := client.Client.Token.Check(ctx, input)
+
+	if err != nil && resp == nil {
+		// log.Fatal(err, "Error, Please Try Again.")
+		// fmt.Println("\n > No User logged in, You must Login to use Securelee Vault Services.")
+		// os.Exit(0)
+		return nil, "No User"
+	}
+
+	if *resp.Status == "Success" {
+		return resp.Result, ""
+	}
+
+	return nil, "Invalid Token"
 
 }
 
-// func flowHandlePasswordPhase(ctx context.Context, client *authn.AuthN, flow_id, password string) *authn.FlowUpdateResult {
-// 	fmt.Println("Handling password phase...")
-// 	resp, err := client.Flow.Update(ctx, authn.FlowUpdateRequest{
-// 		FlowID: flow_id,
-// 		Choice: authn.FCPassword,
-// 		Data: authn.FlowUpdateDataPassword{
-// 			Password: password,
-// 		},
-// 	})
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	return resp.Result
-// }
+func FileExists(filename string) bool {
+	_, err := os.Stat(filename)
+	return os.IsNotExist(err)
+}
 
-// func flowHandleProfilePhase(ctx context.Context, client *authn.AuthN, flow_id string, profile *authn.ProfileData) *authn.FlowUpdateResult {
-// 	fmt.Println("Handling profile phase...")
-// 	resp, err := client.Flow.Update(ctx, authn.FlowUpdateRequest{
-// 		FlowID: flow_id,
-// 		Choice: authn.FCProfile,
-// 		Data: authn.FlowUpdateDataProfile{
-// 			Profile: *profile,
-// 		},
-// 	})
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	return resp.Result
-// }
+func LoginWithEmail(Email string, Password string) (string, string, error) {
 
-// func flowHandleAgreementsPhase(ctx context.Context, client *authn.AuthN, flow_id string, result *authn.FlowUpdateResult) *authn.FlowUpdateResult {
-// 	// Iterate over flow_choices in response.result
-// 	fmt.Println("Handling agreements phase...")
-// 	agreed := []string{}
-// 	for _, flowChoice := range result.FlowChoices {
-// 		// Check if the choice is AGREEMENTS
-// 		if flowChoice.Choice == string(authn.FCAgreements) {
-// 			// Assuming flowChoice.Data["agreements"] is a map[string]interface{}
-// 			agreements, ok := flowChoice.Data["agreements"].(map[string]interface{})
-// 			if ok {
-// 				// Iterate over agreements and append the "id" values to agreed slice
-// 				for _, v := range agreements {
-// 					agreement, ok := v.(map[string]interface{})
-// 					if ok {
-// 						id, ok := agreement["id"].(string)
-// 						if ok {
-// 							agreed = append(agreed, id)
-// 						}
-// 					}
-// 				}
-// 			}
-// 		}
-// 	}
+	//check if user is new or no
+	var usertype string
+	resp, err := NewUser(Email)
+	if err != nil {
+		return "", "", err
+	}
+	ctx, cancelFn := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancelFn()
+	client := Init()
 
-// 	resp, err := client.Flow.Update(ctx, authn.FlowUpdateRequest{
-// 		FlowID: flow_id,
-// 		Choice: authn.FCAgreements,
-// 		Data: authn.FlowUpdateDataAgreements{
-// 			Agreed: agreed,
-// 		},
-// 	})
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	return resp.Result
-// }
+	if *resp == "InvalidUser" {
+		usertype = "New User"
 
-// func choiceIsAvailable(choices []authn.FlowChoiceItem, choice string) bool {
-// 	for _, fc := range choices {
-// 		if fc.Choice == choice {
-// 			return true
+		var first, last string
+		fmt.Scanf(" > Enter your First Name: %s \n", &first)
+		fmt.Scanf(" > Enter your Last Name: %s \n", &last)
 
-// 		}
-// 	}
-// 	return false
-// }
+		profile := &authn.ProfileData{
+			"first_name": first,
+			"last_name":  last,
+		}
 
-// func CreateAndLogin(first_name string, last_name string, email string, password string) *authn.FlowCompleteResult {
-// 	r := mux.NewRouter()
+		input := authn.UserCreateRequest{
+			Email:   Email,
+			Profile: profile,
+		}
 
-// 	r.HandleFunc("/callback", controller.Callback).Methods("GET")
+		//creating the user profile
+		out, err := client.User.Create(ctx, input)
+		if err != nil || out == nil {
+			fmt.Println("Failed to create a new user")
+		}
+		id := out.Result.Profile
+		fmt.Println(id)
+		os.Exit(0)
 
-// 	l, err := net.Listen("tcp", "localhost:8088")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
+		//adding password for the user profile
+		err = PassReset(out.Result.ID, Password)
+		if err != nil {
+			return "", "", err
+		}
 
-// 	go func() {
-// 		if err := http.Serve(l, r); err != nil {
-// 			log.Fatal(err)
-// 		}
-// 	}()
+	} else if *resp == "Success" {
+		usertype = "Old User"
+	}
 
-// 	ctx, cancelFn := context.WithTimeout(context.Background(), 10*time.Second)
-// 	defer cancelFn()
+	//login using password
+	result, err := LoginWithPass(Email, Password)
+	if err != nil {
+		return "", "", err
+	}
 
-// 	client := Init()
+	token := fmt.Sprintf("%s", result.ActiveToken)
 
-// 	profile := &authn.ProfileData{
-// 		"first_name": first_name,
-// 		"last_name":  last_name,
-// 	}
+	return token, usertype, nil
 
-// 	fmt.Println("Flow starting...")
-// 	fsresp, err := client.Flow.Start(ctx,
-// 		authn.FlowStartRequest{
-// 			Email:     email,
-// 			FlowTypes: []authn.FlowType{authn.FTsignup, authn.FTsignin},
-// 			CBURI:     CB_URI,
-// 		})
-// 	// fsresp, err := authn.Flow.Start(ctx,
-// 	// 	authn.FlowStartRequest{
-// 	// 		Email:     email,
-// 	// 		FlowTypes: []authn.FlowType{authn.FTsignup, authn.FTsignin},
-// 	// 		CBURI:     CB_URI,
-// 	// 	})
+}
 
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	flowID := fsresp.Result.FlowID
-// 	var result *authn.FlowUpdateResult
-// 	flowPhase := "initial"
-// 	choices := fsresp.Result.FlowChoices
-// 	fmt.Println(fsresp.Result.FlowChoices)
+// Logout the Current User's Session
+func Logout() error {
+	res := Check()
+	if !res {
+		fmt.Println("\n > No User logged in, You must Login to use Securelee Vault Services.")
+		os.Exit(0)
+	}
 
-// 	for flowPhase != "phase_completed" {
-// 		if choiceIsAvailable(choices, string(authn.FCPassword)) {
-// 			fmt.Printf("true")
-// 			result = flowHandlePasswordPhase(ctx, client, flowID, password)
-// 		} else if choiceIsAvailable(choices, string(authn.FCProfile)) {
-// 			fmt.Printf("true")
-// 			result = flowHandleProfilePhase(ctx, client, flowID, profile)
-// 		} else if choiceIsAvailable(choices, string(authn.FCAgreements)) {
-// 			fmt.Printf("true")
-// 			result = flowHandleAgreementsPhase(ctx, client, flowID, result)
-// 		} else {
-// 			if result != nil {
-// 				fmt.Printf("Phase %s not handled", result.FlowPhase)
-// 			} else {
-// 				fmt.Printf("Phase not handled, result is nil")
-// 			}
-// 		}
-// 		if result != nil {
-// 			fmt.Printf("true11")
-// 			flowPhase = result.FlowPhase
-// 			choices = result.FlowChoices
-// 		} else {
-// 			fmt.Printf("true1")
-// 			break
-// 		}
-// 	}
+	ctx, cancelFn := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancelFn()
+	client := Init()
 
-// 	fcresp, err := client.Flow.Complete(ctx,
-// 		authn.FlowCompleteRequest{
-// 			FlowID: flowID,
-// 		})
+	user, err := user.Current()
+	if err != nil {
+		log.Fatal(err)
+	}
+	filePath := filepath.Join(user.HomeDir, "/securelee/token.json")
 
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
+	jsonData, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return err
+	}
+	var TokenData struct {
+		Token string `json:"token"`
+	}
+	err = json.Unmarshal(jsonData, &TokenData)
+	if err != nil {
+		return err
+	}
 
-// 	user, err := user.Current()
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	filePath := filepath.Join(user.HomeDir, "Securelee/tokens.json")
+	token := TokenData.Token
 
-// 	data, err := json.Marshal(fcresp.Result)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	err = ioutil.WriteFile(filePath, data, 0644)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
+	input := authn.ClientSessionLogoutRequest{
+		Token: token,
+	}
+	_, err = client.Client.Session.Logout(ctx, input)
+	if err != nil {
+		// return err
+		fmt.Println("\n > No User logged in, You must Login to use Securelee Vault Services.")
+		os.Exit(0)
+	}
 
-// 	return fcresp.Result
-// }
+	err = os.Remove(filePath)
+	if err != nil {
+		return err
+	}
 
-func Logout() {
+	return nil
 
+}
+
+func NewUser(Email string) (*string, error) {
+	ctx, cancelFn := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancelFn()
+	client := Init()
+
+	input := authn.UserProfileGetRequest{
+		Email: pangea.String(Email),
+	}
+	resp, err := client.User.Profile.Get(ctx, input)
+	if err != nil || resp == nil {
+		return nil, err
+	}
+
+	return resp.Status, nil
 }

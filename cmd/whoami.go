@@ -1,27 +1,54 @@
 /*
 Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+	"os/user"
+	"path/filepath"
 
+	"github.com/Siddheshk02/Securelee-cli/lib"
 	"github.com/spf13/cobra"
 )
 
 // whoamiCmd represents the whoami command
 var whoamiCmd = &cobra.Command{
 	Use:   "whoami",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "The Current User of Securelee Vault.",
+	Long:  `The Current User of Securelee Vault.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("whoami called")
+		// fmt.Println("whoami called")
+		res := lib.Check()
+		if !res {
+			fmt.Println("\n > No User logged in, You must Login to use Securelee Vault Services.")
+			os.Exit(0)
+		}
+
+		user, err := user.Current()
+		if err != nil {
+			log.Fatal(err)
+		}
+		filePath := filepath.Join(user.HomeDir, "/securelee/token.json")
+
+		jsonData, err := ioutil.ReadFile(filePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var UserData struct {
+			Name  string `json:"name"`
+			Email string `json:"email"`
+		}
+		err = json.Unmarshal(jsonData, &UserData)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("\n > Logged In as : ", UserData.Name, " (", UserData.Email, ")")
 	},
 }
 

@@ -2,6 +2,7 @@ package mailing
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"os"
 	"strconv"
@@ -38,6 +39,32 @@ func EmailVerify(email string) error {
 	if check != code {
 		fmt.Println("Invalid Code Entered!")
 		os.Exit(1)
+	}
+
+	return nil
+}
+
+func SendMail(name string, email string) error {
+	err := godotenv.Load(".env")
+	from := mail.NewEmail("Securely", "noreply@securelee.tech")
+	key := os.Getenv("SENDGRID_API_KEY")
+
+	subject := "Welcome to Securelee Vault!"
+
+	to := mail.NewEmail(name, email)
+
+	plainTextContent := "Hey " + name + ", Welcome to Securelee! We're glad you're here."
+
+	htmlContent := "<strong>Hey " + name + "</strong>,<br> <p> Welcome to Securelee! </p> <p> We're glad you're here.<p> If you have any queries regarding Securelee CLI, feel free to reach out to us at enquiry@securelee.tech . </p> <p> We're here with you every step of the way.</p> <br> <p> Best Regards,</p> <p>Securelee Team</p>"
+
+	message := mail.NewSingleEmail(from, subject, to, plainTextContent, htmlContent)
+
+	client := sendgrid.NewSendClient(key)
+
+	response, err := client.Send(message)
+	_ = response
+	if err != nil {
+		log.Println(err)
 	}
 
 	return nil
