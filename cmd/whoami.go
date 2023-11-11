@@ -26,6 +26,7 @@ var whoamiCmd = &cobra.Command{
 		res := lib.Check()
 		if !res {
 			fmt.Println("\n > No User logged in, You must Login to use Securelee Vault Services.")
+			fmt.Println("")
 			os.Exit(0)
 		}
 
@@ -49,6 +50,7 @@ var whoamiCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 		fmt.Println("\n > Logged In as : ", UserData.Name, " (", UserData.Email, ")")
+		fmt.Println("")
 	},
 }
 

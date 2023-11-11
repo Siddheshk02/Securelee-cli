@@ -46,7 +46,7 @@ func EmailVerify(email string) error {
 
 func SendMail(name string, email string) error {
 	err := godotenv.Load(".env")
-	from := mail.NewEmail("Securely", "noreply@securelee.tech")
+	from := mail.NewEmail("Securelee", "noreply@securelee.tech")
 	key := os.Getenv("SENDGRID_API_KEY")
 
 	subject := "Welcome to Securelee Vault!"

@@ -3,12 +3,14 @@ package lib
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/user"
 	"path/filepath"
+	"regexp"
 	"time"
 
 	"github.com/pangeacyber/pangea-go/pangea-sdk/v2/service/authn"
@@ -105,19 +107,24 @@ func LoginWithEmail(Email string, Password string) (string, string, error) {
 	//check if user is new or no
 	var usertype string
 	resp, err := NewUser(Email)
-	if err != nil {
+	if resp == "" && err != nil {
 		return "", "", err
 	}
+
 	ctx, cancelFn := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancelFn()
 	client := Init()
 
-	if *resp == "InvalidUser" {
+	if resp == "InvalidUser" {
 		usertype = "New User"
 
 		var first, last string
-		fmt.Scanf(" > Enter your First Name: %s \n", &first)
-		fmt.Scanf(" > Enter your Last Name: %s \n", &last)
+		fmt.Print("> Enter your First Name: ")
+		fmt.Scan(&first)
+		fmt.Println("")
+		fmt.Print("> Enter your Last Name: ")
+		fmt.Scan(&last)
+		fmt.Println("")
 
 		profile := &authn.ProfileData{
 			"first_name": first,
@@ -125,18 +132,18 @@ func LoginWithEmail(Email string, Password string) (string, string, error) {
 		}
 
 		input := authn.UserCreateRequest{
-			Email:   Email,
-			Profile: profile,
+			Email:         Email,
+			Profile:       profile,
+			Authenticator: Password,
+			IDProvider:    authn.IDPPassword,
 		}
 
 		//creating the user profile
 		out, err := client.User.Create(ctx, input)
 		if err != nil || out == nil {
 			fmt.Println("Failed to create a new user")
+			log.Fatal(err)
 		}
-		id := out.Result.Profile
-		fmt.Println(id)
-		os.Exit(0)
 
 		//adding password for the user profile
 		err = PassReset(out.Result.ID, Password)
@@ -144,7 +151,7 @@ func LoginWithEmail(Email string, Password string) (string, string, error) {
 			return "", "", err
 		}
 
-	} else if *resp == "Success" {
+	} else if resp == "Success" {
 		usertype = "Old User"
 	}
 
@@ -154,7 +161,7 @@ func LoginWithEmail(Email string, Password string) (string, string, error) {
 		return "", "", err
 	}
 
-	token := fmt.Sprintf("%s", result.ActiveToken)
+	token := fmt.Sprintf("%s", result.ActiveToken.Token)
 
 	return token, usertype, nil
 
@@ -165,6 +172,7 @@ func Logout() error {
 	res := Check()
 	if !res {
 		fmt.Println("\n > No User logged in, You must Login to use Securelee Vault Services.")
+		fmt.Println("")
 		os.Exit(0)
 	}
 
@@ -211,7 +219,15 @@ func Logout() error {
 
 }
 
-func NewUser(Email string) (*string, error) {
+type APIError struct {
+	RequestID    string `json:"request_id"`
+	RequestTime  string `json:"request_time"`
+	ResponseTime string `json:"response_time"`
+	Status       string `json:"status"`
+	Summary      string `json:"summary"`
+}
+
+func NewUser(Email string) (string, error) {
 	ctx, cancelFn := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancelFn()
 	client := Init()
@@ -220,9 +236,28 @@ func NewUser(Email string) (*string, error) {
 		Email: pangea.String(Email),
 	}
 	resp, err := client.User.Profile.Get(ctx, input)
-	if err != nil || resp == nil {
-		return nil, err
+
+	if resp == nil {
+		re := regexp.MustCompile(`\{[^{}]*\}`)
+		match := re.Find([]byte(err.Error()))
+
+		if match == nil {
+			// log.Fatal("No JSON data found in the error message")
+			return "", errors.New("No JSON data found in the error message")
+		}
+
+		var apiError APIError
+		err = json.Unmarshal(match, &apiError)
+		if err != nil {
+			// log.Fatal("Error unmarshalling JSON:", err)
+			return "", err
+
+		}
+
+		return apiError.Status, nil
 	}
 
-	return resp.Status, nil
+	// fmt.Println(apiError.Status)
+
+	return *resp.Status, nil
 }

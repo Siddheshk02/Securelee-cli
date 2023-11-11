@@ -27,15 +27,17 @@ var loginCmd = &cobra.Command{
 
 		res := lib.Check()
 		if res == true {
-			fmt.Println("Already logged in!")
+			fmt.Println("\n> Already logged in!")
+			fmt.Println("")
 			os.Exit(0)
 		}
 
 		var choice int
 		var token string
+		var err error
 		var result *authn.ClientTokenCheckResult
 		var ch, usertype string
-		fmt.Println(" Select any one option: ")
+		fmt.Println("\n Select any one option: ")
 		fmt.Println("\n> 1. Login using Socials through Browser")
 		fmt.Println("> 2. Login using Email and Password on the Terminal")
 		fmt.Println("")
@@ -62,11 +64,17 @@ var loginCmd = &cobra.Command{
 			fmt.Print("> Enter your Email Address : ")
 			fmt.Scan(&email)
 			fmt.Println("")
-			fmt.Print("> Enter your Password : ")
+			fmt.Print("> Enter your Password ")
+			fmt.Print("\n { Password must have \n   - at least 8 characters,\n   - at least 1 number characters,\n   - at least 1 special characters } : ")
 			fmt.Scan(&password)
 			fmt.Println("")
+			check := lib.IsValidPassword(password)
+			if !check {
+				fmt.Println("> Invalid Password.")
+				os.Exit(0)
+			}
 
-			token, usertype, err := lib.LoginWithEmail(email, password)
+			token, usertype, err = lib.LoginWithEmail(email, password)
 
 			if token == "" && usertype == "" && err != nil {
 				log.Fatalln(err.Error())
@@ -80,7 +88,8 @@ var loginCmd = &cobra.Command{
 			}
 
 		} else {
-			fmt.Println(" Invalid Choice Entered!!, Please try again")
+			fmt.Println("> Invalid Choice Entered!!, Please try again")
+			fmt.Println("")
 			os.Exit(0)
 		}
 
@@ -110,11 +119,14 @@ var loginCmd = &cobra.Command{
 
 		if choice == 1 {
 			fmt.Println("\n> Successfully Logged in as ", info.Name, " (", info.Email, ")")
+			fmt.Println("")
 		} else if choice == 2 {
 			if usertype == "Old User" {
 				fmt.Println("\n> Successfully Logged in as ", info.Name, " (", info.Email, ")")
+				fmt.Println("")
 			} else if usertype == "New User" {
 				fmt.Println("\n> Successfully Created and Logged in as ", info.Name, " (", info.Email, ")")
+				fmt.Println("")
 			}
 		}
 
@@ -123,7 +135,7 @@ var loginCmd = &cobra.Command{
 			log.Fatal("Error occured!, try again.")
 		}
 
-		path := currentUser.HomeDir + "/securelee"
+		path := currentUser.HomeDir + "/Securelee"
 		err = os.MkdirAll(path, os.ModePerm)
 		if err != nil {
 			log.Fatal("Error occured!, try again.")
