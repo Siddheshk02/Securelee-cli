@@ -16,13 +16,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// whoamiCmd represents the whoami command
-var whoamiCmd = &cobra.Command{
-	Use:   "whoami",
-	Short: "The Current User of Securelee Vault.",
-	Long:  `The Current User of Securelee Vault.`,
+// createCmd represents the create command
+var createCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Create and Store a Secret Message or Key.",
+	Long:  `Create and Store a Secret Messages or Keys.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// fmt.Println("whoami called")
 		res := lib.Check()
 		if !res {
 			fmt.Println("\n > No User logged in, You must Login to use Securelee Vault Services.")
@@ -42,28 +41,30 @@ var whoamiCmd = &cobra.Command{
 		}
 
 		var userData struct {
-			Name  string `json:"name"`
-			Email string `json:"email"`
+			UserID string `json:"userID"`
 		}
 		err = json.Unmarshal(jsonData, &userData)
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println("\n > Logged In as : ", userData.Name, " (", userData.Email, ")")
-		fmt.Println("")
+
+		err = lib.Create(userData.UserID)
+		if err != nil {
+			log.Fatal(err)
+		}
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(whoamiCmd)
+	rootCmd.AddCommand(createCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// whoamiCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// createCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// whoamiCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// createCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

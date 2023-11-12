@@ -45,14 +45,15 @@ var loginCmd = &cobra.Command{
 		fmt.Scanf("%d", &choice)
 		fmt.Println("")
 		if choice == 1 {
-			fmt.Print("\n> Press Enter to Login using Browser (You can get back to CLI after Successful Authentication) : ")
+			fmt.Print("> Press Enter to Login using Browser (You can get back to CLI after Successful Authentication) : ")
 			fmt.Scanf(" ")
+			fmt.Println("")
 			lib.Login()
 			time.Sleep(10 * time.Second)
 
-			fmt.Println("")
 			fmt.Print("> Please Enter the Token from the Securelee Authentication Tab: ")
-			fmt.Scan(&token)
+			fmt.Scan(token)
+			fmt.Println("")
 
 			result, ch = lib.CheckToken(token)
 			if ch != "" {
