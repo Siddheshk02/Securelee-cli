@@ -16,6 +16,7 @@ import (
 	"github.com/Siddheshk02/Securelee-cli/mailing"
 	"github.com/pangeacyber/pangea-go/pangea-sdk/v2/service/authn"
 	"github.com/spf13/cobra"
+	"golang.org/x/term"
 )
 
 // SignUpCmd represents the SignUp command
@@ -27,7 +28,8 @@ var loginCmd = &cobra.Command{
 
 		res := lib.Check()
 		if res == true {
-			fmt.Println("\n> Already logged in!")
+			fmt.Println("\033[36m", "\n > Already logged in!", "\033[0m")
+			// fmt.Println("\n> Already logged in!")
 			fmt.Println("")
 			os.Exit(0)
 		}
@@ -37,66 +39,86 @@ var loginCmd = &cobra.Command{
 		var err error
 		var result *authn.ClientTokenCheckResult
 		var ch, usertype string
-		fmt.Println("\n Select any one option: ")
-		fmt.Println("\n> 1. Login using Socials through Browser")
-		fmt.Println("> 2. Login using Email and Password on the Terminal")
+		fmt.Print("\033[33m", "\n Select any one option: \n", "\033[0m")
+		fmt.Print("\033[33m", "\n > 1. Login using Socials through Browser\n", "\033[0m")
+		fmt.Print("\033[33m", "> 2. Login using Email and Password on the Terminal\n", "\033[0m")
 		fmt.Println("")
-		fmt.Print("> Enter your choice (for e.g. 1): ")
+		fmt.Print("\033[36m", " > Enter your choice (for e.g. 1): ", "\033[0m")
 		fmt.Scanf("%d", &choice)
 		fmt.Println("")
 		if choice == 1 {
-			fmt.Print("> Press Enter to Login using Browser (You can get back to CLI after Successful Authentication) : ")
-			fmt.Scanf(" ")
-			fmt.Println("")
-			lib.Login()
-			time.Sleep(10 * time.Second)
+			// c := color.New(color.FgCyan, color.Bold)
+			// var str any
+			fmt.Print("\033[33m", " > Press Enter to Login using Browser", "\033[0m")
+			fmt.Print("\033[35m", "  (You can get back to CLI after Successful Authentication) : ", "\033[0m")
+			// fmt.Print("")
 
-			fmt.Print("> Please Enter the Token from the Securelee Authentication Tab: ")
-			fmt.Scan(token)
+			_, _ = term.ReadPassword(int(os.Stdin.Fd()))
+
+			// _, key, _ := keyboard.GetSingleKey()
 			fmt.Println("")
+
+			// Check if the key is Enter
+			// if key == keyboard.KeyEnter {
+			lib.Login()
+			time.Sleep(25 * time.Second)
+
+			fmt.Print("\033[33m", "\n > Please Enter the Token from the Securelee Authentication Tab: ", "\033[0m")
+			fmt.Scan(&token)
+			// time.Sleep()
+			// }
+
+			if token == "" {
+				fmt.Println("\033[31m", " > Invalid Token. Please try again.", "\033[0m")
+			}
 
 			result, ch = lib.CheckToken(token)
 			if ch != "" {
-				log.Fatal(ch)
+				fmt.Println("\033[31m", "\n", ch, "\033[0m")
 			}
 
 		} else if choice == 2 {
-			var email, password string
-			fmt.Print("> Enter your Email Address : ")
+			var email string
+			fmt.Print("\033[33m", " > Enter your Email Address : ", "\033[0m")
 			fmt.Scan(&email)
 			fmt.Println("")
-			fmt.Print("> Enter your Password ")
-			fmt.Print("\n { Password must have \n   - at least 8 characters,\n   - at least 1 number characters,\n   - at least 1 special characters } : ")
-			fmt.Scan(&password)
+			fmt.Print("\033[33m", " > Enter your Password ", "\033[0m")
+			fmt.Print("\033[35m", "\n  { Password must have \n   - at least 8 characters,\n   - at least 1 number characters,\n   - at least 1 special characters } : ", "\033[0m")
+			// fmt.Scan(&password)
+			password, _ := term.ReadPassword(int(os.Stdin.Fd()))
 			fmt.Println("")
-			check := lib.IsValidPassword(password)
+			check := lib.IsValidPassword(string(password))
 			if !check {
-				fmt.Println("> Invalid Password.")
-				os.Exit(0)
+				fmt.Println("\033[31m", " > Invalid Password.", "\033[0m")
+				return
 			}
 
-			token, usertype, err = lib.LoginWithEmail(email, password)
+			token, usertype, err = lib.LoginWithEmail(email, string(password))
 
 			if token == "" && usertype == "" && err != nil {
-				log.Fatalln(err.Error())
+				log.Fatalln("\033[31m", err.Error(), "\033[0m")
+			} else if token == "" && usertype != "" && err == nil {
+				fmt.Println("\033[31m", "\n > ", usertype, "\033[0m")
+				fmt.Println("")
+				return
 			}
 
 			if token != "" {
 				result, ch = lib.CheckToken(token)
 				if ch != "" {
-					log.Fatal(ch)
+					log.Fatal("\033[31m", ch, "\033[0m")
 				}
 			}
 
 		} else {
-			fmt.Println("> Invalid Choice Entered!!, Please try again")
+			fmt.Println("\033[31m", "\n > Invalid Choice Entered!!, Please try again", "\033[0m")
 			fmt.Println("")
-			os.Exit(0)
+			return
 		}
 
 		parsedTime, err := time.Parse(time.RFC3339, result.Expire)
 		if err != nil {
-			log.Fatal(err.Error())
+			log.Fatal("\033[31m", err.Error(), "\033[0m")
 		}
 
 		info := struct {
@@ -115,50 +137,50 @@ var loginCmd = &cobra.Command{
 
 		err = mailing.SendMail(info.Name, info.Email)
 		if err != nil {
-			log.Fatalln(err.Error())
+			log.Fatalln("\033[31m", err.Error(), "\033[0m")
 		}
 
 		if choice == 1 {
-			fmt.Println("\n> Successfully Logged in as ", info.Name, " (", info.Email, ")")
+			fmt.Println("\033[36m", "\n > Successfully Logged in as ", info.Name, " (", info.Email, ")", "\033[0m")
 			fmt.Println("")
 		} else if choice == 2 {
 			if usertype == "Old User" {
-				fmt.Println("\n> Successfully Logged in as ", info.Name, " (", info.Email, ")")
+				fmt.Println("\033[36m", "\n > Successfully Logged in as ", info.Name, " (", info.Email, ")", "\033[0m")
 				fmt.Println("")
 			} else if usertype == "New User" {
-				fmt.Println("\n> Successfully Created and Logged in as ", info.Name, " (", info.Email, ")")
+				fmt.Println("\033[36m", "\n > Successfully Created and Logged in as ", info.Name, " (", info.Email, ")", "\033[0m")
 				fmt.Println("")
 			}
 		}
 
 		currentUser, err := user.Current()
 		if err != nil {
-			log.Fatal("Error occured!, try again.")
+			log.Fatal("\033[31m", " > Error occured!, try again.", "\033[0m")
 		}
 
 		path := currentUser.HomeDir + "/Securelee"
 		err = os.MkdirAll(path, os.ModePerm)
 		if err != nil {
-			log.Fatal("Error occured!, try again.")
+			log.Fatal("\033[31m", "Error occured!, try again.", "\033[0m")
 		}
 
 		tokenPath := currentUser.HomeDir + "/Securelee/token.json"
 
 		data, err := json.Marshal(info)
 		if err != nil {
-			log.Fatal(err.Error())
+			log.Fatal("\033[31m", err.Error(), "\033[0m")
 		}
 
 		file, err := os.Create(tokenPath)
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Println("\033[31m", err.Error(), "\033[0m")
 			return
 		}
 		defer file.Close()
 
 		err = ioutil.WriteFile(file.Name(), []byte(data), 0644)
 		if err != nil {
-			log.Fatal(err.Error())
+			log.Fatal("\033[31m", err.Error(), "\033[0m")
 		}
 
 	},

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"regexp"
 	"strings"
@@ -17,11 +16,11 @@ import (
 
 func Create(ID string) error {
 	var choice int
-	fmt.Println("\n Select any one option: ")
-	fmt.Println("\n> 1. Store a Secret Message")
-	fmt.Println("> 2. Create or Store a Key")
+	fmt.Print("\033[33m", "\n Select any one option: \n", "\033[0m")
+	fmt.Println("\033[33m", "\n > 1. Store a Secret Message", "\033[0m")
+	fmt.Println("\033[33m", "> 2. Create or Store a Key", "\033[0m")
 	fmt.Println("")
-	fmt.Print("> Enter your choice (for e.g. 1): ")
+	fmt.Print("\033[36m", " > Enter your choice (for e.g. 1): ", "\033[0m")
 	fmt.Scanf("%d", &choice)
 	fmt.Println("")
 	var str string
@@ -31,7 +30,7 @@ func Create(ID string) error {
 	} else if choice == 2 {
 		str = "keys"
 	} else {
-		fmt.Println("> Invalid Choice Entered!!, Please try again")
+		fmt.Println("\033[31m", "\n > Invalid Choice Entered!!, Please try again", "\033[0m")
 		fmt.Println("")
 		os.Exit(0)
 	}
@@ -55,18 +54,21 @@ func Create(ID string) error {
 
 	if choice == 1 {
 		var secretvalue, secretname string
-		fmt.Print("> Enter the Secret Value {Minimum Size : 1, Maximum Size: 10240} : ")
+		fmt.Print("\033[33m", " > Enter the Secret Value ", "\033[0m")
+		fmt.Print("\033[35m", "(no spaces in-between) {Minimum Size : 1, Maximum Size: 10240} : ", "\033[0m")
 		fmt.Scan(&secretvalue)
 		fmt.Println("")
-		fmt.Print("> Enter the Name for the Secret (no spaces in-between): ")
+		fmt.Print("\033[33m", " > Enter the Name for the Secret ", "\033[0m")
+		fmt.Print("\033[35m", "(no spaces in-between): ", "\033[0m")
 		fmt.Scan(&secretname)
-		time.Sleep(7 * time.Second)
+
+		fmt.Println("")
+		// time.Sleep(15 * time.Second)
 
 		input := &vault.SecretStoreRequest{
 			CommonStoreRequest: vault.CommonStoreRequest{
-				Name:          secretname,
-				Folder:        folder,
-				RotationState: vault.IVSactive,
+				Name:   secretname,
+				Folder: folder,
 			},
 			Secret: secretvalue,
 		}
@@ -76,10 +78,11 @@ func Create(ID string) error {
 		}
 
 		if *rStore.Status != "Success" {
-			log.Fatal("\n> A Secret with same name exists.")
+			fmt.Println("\033[31m", " > A Secret with same name exists.", "\033[0m")
+			os.Exit(0)
 		}
 
-		fmt.Println("\n> Secret Successfully Stored!!")
+		fmt.Println("\033[36m", " > Secret Successfully Stored!!", "\033[0m")
 
 		return nil
 
@@ -89,22 +92,22 @@ func Create(ID string) error {
 		if res == "" && err != nil {
 			return err
 		} else if res != "" && err != nil {
-			fmt.Println("\n> ", res)
+			fmt.Println("\033[31m", "\n > ", res, "\033[0m")
 			fmt.Println("")
 			return nil
 		} else if res != "" && err == nil {
 			if res == "Success" {
 				if ch == 1 {
-					fmt.Println("> Key Stored Successfully!")
+					fmt.Println("\033[36m", " > Key Stored Successfully!", "\033[0m")
 					fmt.Println("")
 					return nil
 				} else {
-					fmt.Println("> Key Genarated Successfully!")
+					fmt.Println("\033[36m", " > Key Genarated Successfully!", "\033[0m")
 					fmt.Println("")
 					return nil
 				}
 			} else {
-				fmt.Println("> The Public Key : ", res)
+				fmt.Println("\033[36m", " > The Public Key : ", res, "\033[0m")
 				return nil
 			}
 		}
@@ -115,11 +118,11 @@ func Create(ID string) error {
 
 func StoreKey(folder string) (string, error, int) {
 	var choice int
-	fmt.Println("\n Select any one option: ")
-	fmt.Println("\n> 1. Import a Key")
-	fmt.Println("> 2. Generate a Key")
+	fmt.Print("\033[33m", "\n Select any one option: \n", "\033[0m")
+	fmt.Println("\033[33m", "\n > 1. Import a Key", "\033[0m")
+	fmt.Println("\033[33m", "> 2. Generate a Key", "\033[0m")
 	// fmt.Println("")
-	fmt.Print("\n> Enter your choice (for e.g. 1): ")
+	fmt.Print("\033[36m", "\n > Enter your choice (for e.g. 1): ", "\033[0m")
 	fmt.Scan(&choice)
 	// _, err := fmt.Scanf("%d", &choice)
 	// if err != nil {
@@ -133,27 +136,31 @@ func StoreKey(folder string) (string, error, int) {
 		defer cancelFn()
 		client := InitVault()
 		var choice2 int
-		fmt.Println("\n Select the Key type: ")
-		fmt.Println("\n> 1. Asymmetric Key")
-		fmt.Println("> 2. Symmetric Key")
+		fmt.Println("\033[33m", "\n Select the Key type: ", "\033[0m")
+		fmt.Println("\033[33m", "\n > 1. Asymmetric Key", "\033[0m")
+		fmt.Println("\033[33m", "> 2. Symmetric Key", "\033[0m")
 		fmt.Println("")
-		fmt.Print("> Enter your choice (for e.g. 1): ")
+		fmt.Print("\033[36m", " > Enter your choice (for e.g. 1): ", "\033[0m")
 		// fmt.Scanf("%d", &choice2)
 		fmt.Scan(&choice2)
 		fmt.Println("")
 
 		if choice2 == 1 {
 			var keyname, keypurpose, publickey, privatekey string
-			fmt.Print("> Enter the Name for the Key (no spaces in-between): ")
+			fmt.Print("\033[33m", " > Enter the Name for the Key ", "\033[0m")
+			fmt.Print("\033[35m", "(no spaces in-between): ", "\033[0m")
 			fmt.Scan(&keyname)
 			fmt.Println("")
-			fmt.Print("> Enter the Purpose for the Key ( for e.g. signing, Encryption): ")
+			fmt.Print("\033[33m", " > Enter the Purpose for the Key ", "\033[0m")
+			fmt.Print("\033[35m", "( for e.g. signing, Encryption): ", "\033[0m")
 			fmt.Scan(&keypurpose)
-			fmt.Println("")
-			fmt.Print("> Enter the Public Key (in PEM format): ")
+			fmt.Print("\n")
+			fmt.Print("\033[33m", " > Enter the Public Key ", "\033[0m")
+			fmt.Print("\033[35m", "(in PEM format): ", "\033[0m")
 			fmt.Scan(&publickey)
 			fmt.Println("")
-			fmt.Print("> Enter the Private Key (in PEM format): ")
+			fmt.Print("\033[33m", " > Enter the Private Key ", "\033[0m")
+			fmt.Print("\033[35m", "(in PEM format): ", "\033[0m")
 			fmt.Scan(&privatekey)
 			fmt.Println("")
 
@@ -162,7 +169,7 @@ func StoreKey(folder string) (string, error, int) {
 					CommonStoreRequest: vault.CommonStoreRequest{
 						Name:          keyname,
 						Folder:        folder,
-						RotationState: vault.IVSactive,
+						RotationState: vault.IVSdeactivated,
 					},
 					Algorithm:  vault.AAed25519,
 					Purpose:    vault.KeyPurpose(keypurpose),
@@ -179,12 +186,12 @@ func StoreKey(folder string) (string, error, int) {
 				}
 
 				var apiError APIError
-				err = json.Unmarshal(match, &apiError)
-				if err != nil {
-					return "", err, choice
+				err1 := json.Unmarshal(match, &apiError)
+				if err1 != nil {
+					return "", err1, choice
 				}
 
-				parts := strings.Split(apiError.Summary, ":")
+				parts := strings.Split(apiError.Summary, ": ")
 
 				content := strings.TrimSpace(parts[1])
 
@@ -197,10 +204,12 @@ func StoreKey(folder string) (string, error, int) {
 
 		} else if choice2 == 2 {
 			var keyname, key string
-			fmt.Print("> Enter the Name for the Key (no spaces in-between): ")
+			fmt.Print("\033[33m", " > Enter the Name for the Key ", "\033[0m")
+			fmt.Print("\033[35m", "(no spaces in-between): ", "\033[0m")
 			fmt.Scan(&keyname)
 			fmt.Println("")
-			fmt.Print("> Enter the Key (base64): ")
+			fmt.Print("\033[33m", " > Enter the Key ", "\033[0m")
+			fmt.Print("\033[35m", "(base64): ", "\033[0m")
 			fmt.Scan(&key)
 			fmt.Println("")
 
@@ -241,7 +250,7 @@ func StoreKey(folder string) (string, error, int) {
 				}
 			}
 		} else {
-			fmt.Println("> Invalid Choice Entered!!, Please try again")
+			fmt.Println("\033[31m", "\n > Invalid Choice Entered!!, Please try again", "\033[0m")
 			fmt.Println("")
 			os.Exit(0)
 		}
@@ -251,21 +260,23 @@ func StoreKey(folder string) (string, error, int) {
 		defer cancelFn()
 		client := InitVault()
 		var choice2 int
-		fmt.Println("\n Select the Key type: ")
-		fmt.Println("\n> 1. Asymmetric Key")
-		fmt.Println("> 2. Symmetric Key")
+		fmt.Println("\033[33m", "\n Select the Key type: ", "\033[0m")
+		fmt.Println("\033[33m", "\n > 1. Asymmetric Key", "\033[0m")
+		fmt.Println("\033[33m", "> 2. Symmetric Key", "\033[0m")
 		fmt.Println("")
-		fmt.Print("> Enter your choice (for e.g. 1): ")
+		fmt.Print("\033[36m", " > Enter your choice (for e.g. 1): ", "\033[0m")
 		// fmt.Scanf("%d", &choice2)
 		fmt.Scan(&choice2)
 		fmt.Println("")
 
 		if choice2 == 1 {
 			var keyname, keypurpose string
-			fmt.Print("> Enter the Name for the Key (no spaces in-between): ")
+			fmt.Print("\033[33m", " > Enter the Name for the Key ", "\033[0m")
+			fmt.Print("\033[35m", "(no spaces in-between): ", "\033[0m")
 			fmt.Scan(&keyname)
 			fmt.Println("")
-			fmt.Print("> Enter the Purpose for the Key ( for e.g. signing, Encryption): ")
+			fmt.Print("\033[33m", " > Enter the Purpose for the Key ", "\033[0m")
+			fmt.Print("\033[35m", "( for e.g. signing, Encryption): ", "\033[0m")
 			fmt.Scan(&keypurpose)
 			fmt.Println("")
 
@@ -287,7 +298,8 @@ func StoreKey(folder string) (string, error, int) {
 			}
 		} else if choice2 == 2 {
 			var keyname string
-			fmt.Print("> Enter the Name for the Key (no spaces in-between): ")
+			fmt.Print("\033[33m", " > Enter the Name for the Key ", "\033[0m")
+			fmt.Print("\033[35m", "(no spaces in-between): ", "\033[0m")
 			fmt.Scan(&keyname)
 			fmt.Println("")
 
@@ -308,13 +320,13 @@ func StoreKey(folder string) (string, error, int) {
 				return "Success", nil, choice
 			}
 		} else {
-			fmt.Println("> Invalid Choice Entered!!, Please try again")
+			fmt.Println("\033[31m", "\n > Invalid Choice Entered!!, Please try again", "\033[0m")
 			fmt.Println("")
 			os.Exit(0)
 		}
 
 	} else {
-		fmt.Println("> Invalid Choice Entered!!, Please try again")
+		fmt.Println("\033[31m", "\n > Invalid Choice Entered!!, Please try again", "\033[0m")
 		fmt.Println("")
 		os.Exit(0)
 	}
@@ -338,19 +350,19 @@ func ListSecrets(UserId string) error {
 		return err
 	} else if *resp.Status == "Success" {
 		lists := resp.Result.Items
-		fmt.Println("List of Secrets : ")
+		fmt.Println("\033[33m", "List of Secrets : ", "\033[0m")
 
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
 
 		str := " "
-		fmt.Fprintf(w, "+-------+-------------------------------------------+----------------------------+--------+-----------------+\n")
-		fmt.Fprintf(w, "| Index | ID%-40s| Name %-21s | Type   | State %-9s |", str, str, str)
-		fmt.Fprintf(w, "\n+-------+-------------------------------------------+----------------------------+--------+-----------------+\n")
+		fmt.Fprintf(w, " +-------+-------------------------------------------+----------------------------+--------+-----------------+\n")
+		fmt.Fprintf(w, " | Index | ID%-40s| Name %-21s | Type   | State %-9s |", str, str, str)
+		fmt.Fprintf(w, "\n +-------+-------------------------------------------+----------------------------+--------+-----------------+\n")
 
 		for i := 0; i < resp.Result.Count; i++ {
-			fmt.Fprintf(w, "| %-5d | %-40s  | %-25s  | %-4s | %-15s |\n", i+1, lists[i].ID, lists[i].Name, lists[i].Type, lists[i].CurrentVersion.State)
+			fmt.Fprintf(w, " | %-5d | %-40s  | %-25s  | %-4s | %-15s |\n", i+1, lists[i].ID, lists[i].Name, lists[i].Type, lists[i].CurrentVersion.State)
 		}
-		fmt.Fprintf(w, "+-------+-------------------------------------------+----------------------------+--------+-----------------+\n")
+		fmt.Fprintf(w, " +-------+-------------------------------------------+----------------------------+--------+-----------------+\n")
 
 		w.Flush()
 		return nil
@@ -374,20 +386,20 @@ func ListKeys(UserId string) error {
 	if err != nil {
 		return err
 	} else if *resp.Status == "Success" {
-		fmt.Println("List of Keys : ")
+		fmt.Println("\033[33m", "List of Keys : ", "\033[0m")
 
 		lists := resp.Result.Items
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
 
 		str := " "
-		fmt.Fprintf(w, "+-------+---------------------------------------+----------------------------+----------------+---------------+---------------------------+-----------------+\n")
-		fmt.Fprintf(w, "| Index | ID%-36s| Name %-21s | Type  %-8s | Purpose %-5s | Algorithm %-15s | State %-9s |", str, str, str, str, str, str)
-		fmt.Fprintf(w, "\n+-------+---------------------------------------+----------------------------+----------------+---------------+---------------------------+-----------------+\n")
+		fmt.Fprintf(w, " +-------+---------------------------------------+----------------------------+----------------+---------------+---------------------------+-----------------+\n")
+		fmt.Fprintf(w, " | Index | ID%-36s| Name %-21s | Type  %-8s | Purpose %-5s | Algorithm %-15s | State %-9s |", str, str, str, str, str, str)
+		fmt.Fprintf(w, "\n +-------+---------------------------------------+----------------------------+----------------+---------------+---------------------------+-----------------+\n")
 
 		for i := 0; i < resp.Result.Count; i++ {
-			fmt.Fprintf(w, "| %-5d | %-36s  | %-25s  | %-15s| %-13s | %-25s | %-15s |\n", i+1, lists[i].ID, lists[i].Name, lists[i].Type, lists[i].Purpose, lists[i].Algorithm, lists[i].CurrentVersion.State)
+			fmt.Fprintf(w, " | %-5d | %-36s  | %-25s  | %-15s| %-13s | %-25s | %-15s |\n", i+1, lists[i].ID, lists[i].Name, lists[i].Type, lists[i].Purpose, lists[i].Algorithm, lists[i].CurrentVersion.State)
 		}
-		fmt.Fprintf(w, "+-------+---------------------------------------+----------------------------+----------------+---------------+---------------------------+-----------------+\n")
+		fmt.Fprintf(w, " +-------+---------------------------------------+----------------------------+----------------+---------------+---------------------------+-----------------+\n")
 
 		w.Flush()
 
@@ -421,13 +433,13 @@ func Delete(id string) error {
 		}
 
 		if apiError.Status == "VaultItemNotFound" {
-			fmt.Println("\n> ID doesn't exists. Please try again.\n")
+			fmt.Println("\033[31m", "\n > ID doesn't exists. Please try again.\n", "\033[0m")
 			os.Exit(0)
 		}
 	}
 
 	if *dresp.Status == "Success" {
-		fmt.Println("\n> Item deleted Successfully!\n")
+		fmt.Println("\033[36m", "\n > Item deleted Successfully!\n", "\033[0m")
 		os.Exit(0)
 	}
 
@@ -440,24 +452,23 @@ func Update(id string, req string) error {
 	client := InitVault()
 
 	var name string
-	fmt.Print("\n> Enter the Name for the ", req, " : ")
+	fmt.Print("\033[33m", "\n > Enter the Name for the ", req, " : ", "\033[0m")
 	fmt.Scan(&name)
 	fmt.Println("")
 
 	var state string
 	var choice int
 
-	fmt.Println("\n Select the Item State for the", req, ": ")
-	fmt.Println("\n> 1. Active")
-	fmt.Println("> 2. Deactivated")
-	fmt.Println("> 3. Suspended")
-	fmt.Println("> 4. Compromised")
-	fmt.Println("> 5. Destroyed")
-	fmt.Println("> 6. Inherited")
+	fmt.Println("\033[33m", "\n Select the Item State for the", req, ": ", "\033[0m")
+	fmt.Println("\033[33m", "\n > 1. Active", "\033[0m")
+	fmt.Println("\033[33m", "> 2. Deactivated", "\033[0m")
+	fmt.Println("\033[33m", "> 3. Suspended", "\033[0m")
+	fmt.Println("\033[33m", "> 4. Compromised", "\033[0m")
+	fmt.Println("\033[33m", "> 5. Destroyed", "\033[0m")
 	// fmt.Println("> 1. Enable")
 	// fmt.Println("> 2. Inherited")
 	fmt.Println("")
-	fmt.Print("> Enter your choice (for e.g. 1): ")
+	fmt.Print("\033[36m", " > Enter your choice (for e.g. 1): ", "\033[0m")
 	fmt.Scan(&choice)
 	fmt.Println("")
 
@@ -472,37 +483,34 @@ func Update(id string, req string) error {
 		state = "compromised"
 	case 5:
 		state = "destroyed"
-	case 6:
-		state = "inherited"
 	default:
-		fmt.Println("Invalid Choice! Please try again.")
+		fmt.Println("\033[31m", "Invalid Choice! Please try again.", "\033[0m")
 		os.Exit(0)
 	}
 
-	rUpdate, err := client.Update(ctx,
+	rUpdate, err1 := client.Update(ctx,
 		&vault.UpdateRequest{
 			ID:   id,
 			Name: name,
 		},
 	)
 
-	if err != nil {
-		fmt.Println(err)
+	if err1 != nil {
 		re := regexp.MustCompile(`\{[^{}]*\}`)
-		match := re.Find([]byte(err.Error()))
+		match := re.Find([]byte(err1.Error()))
 
 		if match == nil {
 			return errors.New("No JSON data found in the error message")
 		}
 
 		var apiError APIError
-		err = json.Unmarshal(match, &apiError)
+		err := json.Unmarshal(match, &apiError)
 		if err != nil {
 			return err
 		}
 
 		if apiError.Status == "VaultItemNotFound" {
-			fmt.Println("\n> ID doesn't exists. Please try again.")
+			fmt.Println("\033[31m", "\n > ID doesn't exists. Please try again.", "\033[0m")
 			fmt.Println("")
 			os.Exit(0)
 		}
@@ -513,10 +521,31 @@ func Update(id string, req string) error {
 		State: vault.ItemVersionState(state),
 	}
 
-	scr, err := client.StateChange(ctx, input)
+	scr, err2 := client.StateChange(ctx, input)
+
+	if err2 != nil {
+		re := regexp.MustCompile(`\{[^{}]*\}`)
+		match := re.Find([]byte(err2.Error()))
+
+		if match == nil {
+			return errors.New("No JSON data found in the error message")
+		}
+
+		var apiError APIError
+		err := json.Unmarshal(match, &apiError)
+		if err != nil {
+			return err
+		}
+
+		if apiError.Status != "Success" {
+			fmt.Println("\033[35m", "\n > Item Name Updated!. State can't be Updated.", "\033[0m")
+			fmt.Println("")
+			os.Exit(0)
+		}
+	}
 
 	if *rUpdate.Status == "Success" && *scr.Status == "Success" {
-		fmt.Println("\n> Item Updated Successfully!")
+		fmt.Println("\033[36m", "\n > Item Updated Successfully!", "\033[0m")
 		fmt.Println("")
 		os.Exit(0)
 	}

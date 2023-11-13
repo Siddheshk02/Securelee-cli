@@ -16,12 +16,12 @@ func Init() *authn.AuthN {
 
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Fatal("\033[31m", "Error loading .env file", "\033[0m")
 	}
 	// Get token
 	token := os.Getenv("PANGEA_AUTHN_TOKEN")
 	if token == "" {
-		log.Fatal("Unauthorized: No token present")
+		log.Fatal("\033[31m", "Unauthorized: No token present", "\033[0m")
 	}
 
 	// Create config and client
@@ -36,12 +36,12 @@ func Init() *authn.AuthN {
 func InitVault() vault.Client {
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Fatal("\033[31m", "Error loading .env file", "\033[0m")
 	}
 	// Get token
 	token := os.Getenv("PANGEA_VAULT_TOKEN")
 	if token == "" {
-		log.Fatal("Unauthorized: No token present")
+		log.Fatal("\033[31m", "Unauthorized: No token present", "\033[0m")
 	}
 
 	// Create config and client

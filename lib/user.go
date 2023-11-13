@@ -36,20 +36,21 @@ type TokenInfo struct {
 func Check() bool {
 	user, err := user.Current()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("\033[31m", err, "\033[0m")
 	}
 	filePath := filepath.Join(user.HomeDir, "/securelee/token.json")
 
 	if !FileExists(filePath) {
 		file, err := ioutil.ReadFile(filePath)
 		if err != nil {
-			log.Fatal("Error while fetching the Token!!")
+			log.Fatal("\033[31m", "Error while fetching the Token!!", "\033[0m")
+			os.Exit(0)
 		}
 
 		var token TokenInfo
 		err = json.Unmarshal(file, &token)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("\033[31m", err, "\033[0m")
 		}
 
 		//Check Token Expiry
@@ -119,12 +120,12 @@ func LoginWithEmail(Email string, Password string) (string, string, error) {
 		usertype = "New User"
 
 		var first, last string
-		fmt.Print("> Enter your First Name: ")
+		fmt.Print("\033[33m", "\n > Enter your First Name: ", "\033[0m")
 		fmt.Scan(&first)
 		fmt.Println("")
-		fmt.Print("> Enter your Last Name: ")
+		fmt.Print("\033[33m", " > Enter your Last Name: ", "\033[0m")
 		fmt.Scan(&last)
-		fmt.Println("")
+		// fmt.Println("")
 
 		profile := &authn.ProfileData{
 			"first_name": first,
@@ -141,8 +142,9 @@ func LoginWithEmail(Email string, Password string) (string, string, error) {
 		//creating the user profile
 		out, err := client.User.Create(ctx, input)
 		if err != nil || out == nil {
-			fmt.Println("Failed to create a new user")
-			log.Fatal(err)
+			fmt.Println("\033[31m", "\nFailed to create a new user", "\033[0m")
+			os.Exit(0)
+			// log.Fatal(err)
 		}
 
 		//adding password for the user profile
@@ -156,14 +158,16 @@ func LoginWithEmail(Email string, Password string) (string, string, error) {
 	}
 
 	//login using password
-	result, err := LoginWithPass(Email, Password)
+	result, str, err := LoginWithPass(Email, Password)
 	if err != nil {
 		return "", "", err
+	} else if result == nil && str != "" && err == nil {
+		return "", str, nil
 	}
 
-	token := fmt.Sprintf("%s", result.ActiveToken.Token)
+	// token := fmt.Sprintf("%s", result.ActiveToken.Token)
 
-	return token, usertype, nil
+	return result.ActiveToken.Token, usertype, nil
 
 }
 
@@ -171,7 +175,8 @@ func LoginWithEmail(Email string, Password string) (string, string, error) {
 func Logout() error {
 	res := Check()
 	if !res {
-		fmt.Println("\n > No User logged in, You must Login to use Securelee Vault Services.")
+		fmt.Print("\033[31m", "\n > No User logged in, You must Login to use Securelee Vault Services.\n", "\033[0m")
+		fmt.Print("\033[36m", "\n > Use 'Securelee-cli login' command to complete the Authentication.\n", "\033[0m")
 		fmt.Println("")
 		os.Exit(0)
 	}
@@ -182,7 +187,7 @@ func Logout() error {
 
 	user, err := user.Current()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("\033[31m", err, "\033[0m")
 	}
 	filePath := filepath.Join(user.HomeDir, "/securelee/token.json")
 
@@ -206,7 +211,9 @@ func Logout() error {
 	_, err = client.Client.Session.Logout(ctx, input)
 	if err != nil {
 		// return err
-		fmt.Println("\n > No User logged in, You must Login to use Securelee Vault Services.")
+		fmt.Print("\033[31m", "\n > No User logged in, You must Login to use Securelee Vault Services.\n", "\033[0m")
+		fmt.Print("\033[36m", "\n > Use 'Securelee-cli login' command to complete the Authentication.\n", "\033[0m")
+		fmt.Println("")
 		os.Exit(0)
 	}
 

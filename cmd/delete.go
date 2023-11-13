@@ -25,20 +25,21 @@ var deleteCmd = &cobra.Command{
 		// fmt.Println("delete called")
 		res := lib.Check()
 		if !res {
-			fmt.Println("\n > No User logged in, You must Login to use Securelee Vault Services.")
+			fmt.Print("\033[31m", "\n > No User logged in, You must Login to use Securelee Vault Services.\n", "\033[0m")
+			fmt.Print("\033[36m", "\n > Use 'Securelee-cli login' command to complete the Authentication.\n", "\033[0m")
 			fmt.Println("")
 			os.Exit(0)
 		}
 
 		user, err := user.Current()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("\033[31m", err, "\033[0m")
 		}
 		filePath := filepath.Join(user.HomeDir, "/securelee/token.json")
 
 		jsonData, err := ioutil.ReadFile(filePath)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("\033[31m", err, "\033[0m")
 		}
 
 		var userData struct {
@@ -46,55 +47,55 @@ var deleteCmd = &cobra.Command{
 		}
 		err = json.Unmarshal(jsonData, &userData)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("\033[31m", err, "\033[0m")
 		}
 
 		var choice uint
-		fmt.Println("\n Select any one option: ")
-		fmt.Println("\n> 1. Delete a Secret")
-		fmt.Println("> 2. Delete a Key")
+		fmt.Print("\033[33m", "\n Select any one option: \n", "\033[0m")
+		fmt.Println("\033[33m", "\n > 1. Delete a Secret", "\033[0m")
+		fmt.Println("\033[33m", "> 2. Delete a Key", "\033[0m")
 		fmt.Println("")
-		fmt.Print("> Enter your choice (for e.g. 1): ")
+		fmt.Print("\033[36m", " > Enter your choice (for e.g. 1): ", "\033[0m")
 		fmt.Scanf("%d", &choice)
 		fmt.Println("")
 
 		if choice == 1 {
 			err := lib.ListSecrets(userData.UserID)
 			if err != nil {
-				log.Fatal(err)
+				log.Fatalln("\033[31m", err.Error(), "\033[0m")
 			}
 			var id string
-			fmt.Print("> Enter the ID of the Secret to be Deleted : ")
+			fmt.Print("\033[33m", " > Enter the ID of the Secret to be Deleted : ", "\033[0m")
 			fmt.Scan(&id)
 			if id == "" {
-				fmt.Println("\n> ID cannot be empty. Please try again.")
+				fmt.Println("\033[31m", "\n > ID cannot be empty. Please try again.", "\033[0m")
 				os.Exit(0)
 			}
 
 			err = lib.Delete(id)
 			if err != nil {
-				log.Fatal(err)
+				log.Fatalln("\033[31m", err.Error(), "\033[0m")
 			}
 
 		} else if choice == 2 {
 			err := lib.ListKeys(userData.UserID)
 			if err != nil {
-				log.Fatal(err)
+				log.Fatalln("\033[31m", err.Error(), "\033[0m")
 			}
 			var id string
-			fmt.Print("> Enter the ID of the Key to be Deleted : ")
+			fmt.Print("\033[33m", " > Enter the ID of the Key to be Deleted : ", "\033[0m")
 			fmt.Scan(&id)
 			if id == "" {
-				fmt.Println("\n> ID cannot be empty. Please try again.")
+				fmt.Println("\033[31m", "\n > ID cannot be empty. Please try again.", "\033[0m")
 				os.Exit(0)
 			}
 
 			err = lib.Delete(id)
 			if err != nil {
-				log.Fatal(err)
+				log.Fatalln("\033[31m", err.Error(), "\033[0m")
 			}
 		} else {
-			fmt.Println("> Invalid Choice Entered!!, Please try again")
+			fmt.Println("\033[31m", " > Invalid Choice Entered!!, Please try again", "\033[0m")
 			fmt.Println("")
 			os.Exit(0)
 		}

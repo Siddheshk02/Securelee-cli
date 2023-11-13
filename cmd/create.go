@@ -24,20 +24,21 @@ var createCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		res := lib.Check()
 		if !res {
-			fmt.Println("\n > No User logged in, You must Login to use Securelee Vault Services.")
+			fmt.Print("\033[31m", "\n > No User logged in, You must Login to use Securelee Vault Services.\n", "\033[0m")
+			fmt.Print("\033[36m", "\n > Use 'Securelee-cli login' command to complete the Authentication.\n", "\033[0m")
 			fmt.Println("")
 			os.Exit(0)
 		}
 
 		user, err := user.Current()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalln("\033[31m", err.Error(), "\033[0m")
 		}
 		filePath := filepath.Join(user.HomeDir, "/securelee/token.json")
 
 		jsonData, err := ioutil.ReadFile(filePath)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalln("\033[31m", err.Error(), "\033[0m")
 		}
 
 		var userData struct {
@@ -45,12 +46,12 @@ var createCmd = &cobra.Command{
 		}
 		err = json.Unmarshal(jsonData, &userData)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalln("\033[31m", err.Error(), "\033[0m")
 		}
 
 		err = lib.Create(userData.UserID)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalln("\033[31m", err.Error(), "\033[0m")
 		}
 	},
 }

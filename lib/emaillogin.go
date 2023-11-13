@@ -2,13 +2,16 @@ package lib
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/pangeacyber/pangea-go/pangea-sdk/v2/service/authn"
 )
 
-func LoginWithPass(Email string, Password string) (*authn.UserLoginResult, error) {
+func LoginWithPass(Email string, Password string) (*authn.UserLoginResult, string, error) {
 
 	ctx, cancelFn := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancelFn()
@@ -20,10 +23,35 @@ func LoginWithPass(Email string, Password string) (*authn.UserLoginResult, error
 	}
 	resp, err := client.User.Login.Password(ctx, input)
 	if err != nil {
-		return nil, err
+		re := regexp.MustCompile(`\{[^{}]*\}`)
+		match := re.Find([]byte(err.Error()))
+
+		if match == nil {
+			// log.Fatal("No JSON data found in the error message")
+			return nil, "", errors.New("no JSON data found in the error message")
+		}
+
+		var apiError APIError
+		err = json.Unmarshal(match, &apiError)
+		if err != nil {
+			// log.Fatal("Error unmarshalling JSON:", err)
+			return nil, "", err
+
+		}
+
+		if apiError.Status == "IncorrectAuthenticationProvider" {
+			parts := strings.Split(apiError.Summary, ".")
+
+			if len(parts) >= 3 {
+				result := strings.TrimSpace(parts[2])
+				return nil, result, nil
+			}
+		}
+
+		return nil, "", err
 	}
 
-	return resp.Result, nil
+	return resp.Result, "", nil
 }
 
 func IsValidPassword(password string) bool {

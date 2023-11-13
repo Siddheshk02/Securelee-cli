@@ -20,6 +20,5 @@ func PassReset(Id string, Password string) error {
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
