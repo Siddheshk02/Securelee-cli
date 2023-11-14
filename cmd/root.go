@@ -25,11 +25,10 @@ var rootCmd = &cobra.Command{
 		options.FontColor = []figlet4go.Color{
 			figlet4go.ColorCyan,
 		}
-		// options.Parser.Suffix = "v1.0.0"
 
 		renderStr, _ := ascii.RenderOpts("Securelee.", options)
 		fmt.Print(renderStr)
-		fmt.Print("> v0.1.1")
+		fmt.Print(" > v0.1.1")
 	},
 }
 

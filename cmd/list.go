@@ -53,7 +53,7 @@ var listCmd = &cobra.Command{
 		var choice int
 		fmt.Print("\033[33m", "\n Select any one option: \n", "\033[0m")
 		fmt.Println("\033[33m", "\n > 1. List all Secrets.", "\033[0m")
-		fmt.Println("\033[33m", "> 2. List all Keys", "\033[0m")
+		fmt.Println("\033[33m", " > 2. List all Keys", "\033[0m")
 		fmt.Println("")
 		fmt.Print("\033[36m", " > Enter your choice (for e.g. 1): ", "\033[0m")
 		fmt.Scanf("%d", &choice)

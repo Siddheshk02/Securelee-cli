@@ -53,7 +53,7 @@ var updateCmd = &cobra.Command{
 		var choice uint
 		fmt.Print("\033[33m", "\n Select any one option: \n", "\033[0m")
 		fmt.Println("\033[33m", "\n > 1. Update a Secret", "\033[0m")
-		fmt.Println("\033[33m", "> 2. Update a Key", "\033[0m")
+		fmt.Println("\033[33m", " > 2. Update a Key", "\033[0m")
 		fmt.Println("")
 		fmt.Print("\033[36m", " > Enter your choice (for e.g. 1): ", "\033[0m")
 		fmt.Scanf("%d", &choice)

@@ -50,7 +50,7 @@ var loginCmd = &cobra.Command{
 		var ch, usertype string
 		fmt.Fprintf(out, "\n%s Select any one option: %s\n", yellow, reset)
 		fmt.Fprintf(out, "\n%s > 1. Login using Socials through Browser%s\n", yellow, reset)
-		fmt.Fprintf(out, "%s> 2. Login using Email and Password on the Terminal%s\n", yellow, reset)
+		fmt.Fprintf(out, "%s > 2. Login using Email and Password on the Terminal%s\n", yellow, reset)
 		fmt.Println("")
 		fmt.Fprintf(out, "%s > Enter your choice (for e.g. 1): %s", cyan, reset)
 		fmt.Scanf("%d", &choice)
