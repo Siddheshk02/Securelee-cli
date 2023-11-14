@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +16,7 @@ var versionCmd = &cobra.Command{
 	Short: "Version of the Securelee CLI.",
 	Long:  `Version of the Securelee CLI.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("\033[36m", "\n > Securelee - v0.1.1", "\033[0m")
+		color.Cyan("\n > Securelee - v0.1.1")
 		fmt.Print("\n")
 	},
 }
