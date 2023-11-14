@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
 	"errors"
@@ -11,6 +12,7 @@ import (
 	"text/tabwriter"
 	"time"
 
+	"github.com/pangeacyber/pangea-go/pangea-sdk/v2/pangea"
 	"github.com/pangeacyber/pangea-go/pangea-sdk/v2/service/vault"
 )
 
@@ -18,7 +20,7 @@ func Create(ID string) error {
 	var choice int
 	fmt.Print("\033[33m", "\n Select any one option: \n", "\033[0m")
 	fmt.Println("\033[33m", "\n > 1. Store a Secret Message", "\033[0m")
-	fmt.Println("\033[33m", "> 2. Create or Store a Key", "\033[0m")
+	fmt.Println("\033[33m", " > 2. Create or Store a Key", "\033[0m")
 	fmt.Println("")
 	fmt.Print("\033[36m", " > Enter your choice (for e.g. 1): ", "\033[0m")
 	fmt.Scanf("%d", &choice)
@@ -78,11 +80,11 @@ func Create(ID string) error {
 		}
 
 		if *rStore.Status != "Success" {
-			fmt.Println("\033[31m", " > A Secret with same name exists.", "\033[0m")
+			fmt.Println("\033[31m", " > A Secret with same name exists.\n", "\033[0m")
 			os.Exit(0)
 		}
 
-		fmt.Println("\033[36m", " > Secret Successfully Stored!!", "\033[0m")
+		fmt.Println("\033[36m", " > Secret Successfully Stored!!\n", "\033[0m")
 
 		return nil
 
@@ -108,6 +110,7 @@ func Create(ID string) error {
 				}
 			} else {
 				fmt.Println("\033[36m", " > The Public Key : ", res, "\033[0m")
+				fmt.Print("\n")
 				return nil
 			}
 		}
@@ -120,7 +123,7 @@ func StoreKey(folder string) (string, error, int) {
 	var choice int
 	fmt.Print("\033[33m", "\n Select any one option: \n", "\033[0m")
 	fmt.Println("\033[33m", "\n > 1. Import a Key", "\033[0m")
-	fmt.Println("\033[33m", "> 2. Generate a Key", "\033[0m")
+	fmt.Println("\033[33m", " > 2. Generate a Key", "\033[0m")
 	// fmt.Println("")
 	fmt.Print("\033[36m", "\n > Enter your choice (for e.g. 1): ", "\033[0m")
 	fmt.Scan(&choice)
@@ -138,7 +141,7 @@ func StoreKey(folder string) (string, error, int) {
 		var choice2 int
 		fmt.Println("\033[33m", "\n Select the Key type: ", "\033[0m")
 		fmt.Println("\033[33m", "\n > 1. Asymmetric Key", "\033[0m")
-		fmt.Println("\033[33m", "> 2. Symmetric Key", "\033[0m")
+		fmt.Println("\033[33m", " > 2. Symmetric Key", "\033[0m")
 		fmt.Println("")
 		fmt.Print("\033[36m", " > Enter your choice (for e.g. 1): ", "\033[0m")
 		// fmt.Scanf("%d", &choice2)
@@ -156,12 +159,33 @@ func StoreKey(folder string) (string, error, int) {
 			fmt.Scan(&keypurpose)
 			fmt.Print("\n")
 			fmt.Print("\033[33m", " > Enter the Public Key ", "\033[0m")
-			fmt.Print("\033[35m", "(in PEM format): ", "\033[0m")
-			fmt.Scan(&publickey)
+			fmt.Print("\033[35m", "(in PEM format) ", "\033[0m")
+			fmt.Print("\033[36m", "(Type 'done' on a new line to finish) : ", "\033[0m")
+			var lines []string
+			scanner := bufio.NewScanner(os.Stdin)
+
+			for scanner.Scan() {
+				line := scanner.Text()
+				if line == "done" {
+					break
+				}
+				lines = append(lines, line)
+			}
+			publickey = strings.Join(lines, "\n")
 			fmt.Println("")
 			fmt.Print("\033[33m", " > Enter the Private Key ", "\033[0m")
-			fmt.Print("\033[35m", "(in PEM format): ", "\033[0m")
-			fmt.Scan(&privatekey)
+			fmt.Print("\033[35m", "(in PEM format) ", "\033[0m")
+			fmt.Print("\033[36m", "(Type 'done' on a new line to finish) : ", "\033[0m")
+			var lines1 []string
+
+			for scanner.Scan() {
+				line := scanner.Text()
+				if line == "done" {
+					break
+				}
+				lines1 = append(lines, line)
+			}
+			privatekey = strings.Join(lines1, "\n")
 			fmt.Println("")
 
 			rStore, err := client.AsymmetricStore(ctx,
@@ -216,9 +240,8 @@ func StoreKey(folder string) (string, error, int) {
 			rStore, err := client.SymmetricStore(ctx,
 				&vault.SymmetricStoreRequest{
 					CommonStoreRequest: vault.CommonStoreRequest{
-						Name:          keyname,
-						Folder:        folder,
-						RotationState: vault.IVSactive,
+						Name:   keyname,
+						Folder: folder,
 					},
 					Algorithm: vault.SYAaes,
 					Purpose:   vault.KPencryption,
@@ -262,7 +285,7 @@ func StoreKey(folder string) (string, error, int) {
 		var choice2 int
 		fmt.Println("\033[33m", "\n Select the Key type: ", "\033[0m")
 		fmt.Println("\033[33m", "\n > 1. Asymmetric Key", "\033[0m")
-		fmt.Println("\033[33m", "> 2. Symmetric Key", "\033[0m")
+		fmt.Println("\033[33m", " > 2. Symmetric Key", "\033[0m")
 		fmt.Println("")
 		fmt.Print("\033[36m", " > Enter your choice (for e.g. 1): ", "\033[0m")
 		// fmt.Scanf("%d", &choice2)
@@ -283,9 +306,8 @@ func StoreKey(folder string) (string, error, int) {
 			_, err := client.AsymmetricGenerate(ctx,
 				&vault.AsymmetricGenerateRequest{
 					CommonGenerateRequest: vault.CommonGenerateRequest{
-						Name:          keyname,
-						Folder:        folder,
-						RotationState: vault.IVSactive,
+						Name:   keyname,
+						Folder: folder,
 					},
 					Algorithm: vault.AArsa2048_pkcs1v15_sha256,
 					Purpose:   vault.KeyPurpose(keypurpose),
@@ -306,9 +328,8 @@ func StoreKey(folder string) (string, error, int) {
 			_, err := client.SymmetricGenerate(ctx,
 				&vault.SymmetricGenerateRequest{
 					CommonGenerateRequest: vault.CommonGenerateRequest{
-						Name:          keyname,
-						Folder:        folder,
-						RotationState: vault.IVSactive,
+						Name:   keyname,
+						Folder: folder,
 					},
 					Algorithm: vault.SYAaes,
 					Purpose:   vault.KPencryption,
@@ -334,7 +355,7 @@ func StoreKey(folder string) (string, error, int) {
 	return "", nil, choice
 }
 
-func ListSecrets(UserId string) error {
+func ListSecrets(UserId string) (*pangea.PangeaResponse[vault.ListResult], error) {
 	ctx, cancelFn := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancelFn()
 	client := InitVault()
@@ -347,7 +368,7 @@ func ListSecrets(UserId string) error {
 		})
 
 	if err != nil {
-		return err
+		return nil, err
 	} else if *resp.Status == "Success" {
 		lists := resp.Result.Items
 		fmt.Println("\033[33m", "List of Secrets : ", "\033[0m")
@@ -365,13 +386,13 @@ func ListSecrets(UserId string) error {
 		fmt.Fprintf(w, " +-------+-------------------------------------------+----------------------------+--------+-----------------+\n")
 
 		w.Flush()
-		return nil
+		return resp, nil
 	}
 
-	return nil
+	return nil, nil
 }
 
-func ListKeys(UserId string) error {
+func ListKeys(UserId string) (*pangea.PangeaResponse[vault.ListResult], error) {
 	ctx, cancelFn := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancelFn()
 	client := InitVault()
@@ -384,7 +405,7 @@ func ListKeys(UserId string) error {
 		})
 
 	if err != nil {
-		return err
+		return nil, err
 	} else if *resp.Status == "Success" {
 		fmt.Println("\033[33m", "List of Keys : ", "\033[0m")
 
@@ -403,10 +424,10 @@ func ListKeys(UserId string) error {
 
 		w.Flush()
 
-		return nil
+		return resp, nil
 	}
 
-	return nil
+	return nil, nil
 }
 
 func Delete(id string) error {
@@ -461,10 +482,10 @@ func Update(id string, req string) error {
 
 	fmt.Println("\033[33m", "\n Select the Item State for the", req, ": ", "\033[0m")
 	fmt.Println("\033[33m", "\n > 1. Active", "\033[0m")
-	fmt.Println("\033[33m", "> 2. Deactivated", "\033[0m")
-	fmt.Println("\033[33m", "> 3. Suspended", "\033[0m")
-	fmt.Println("\033[33m", "> 4. Compromised", "\033[0m")
-	fmt.Println("\033[33m", "> 5. Destroyed", "\033[0m")
+	fmt.Println("\033[33m", " > 2. Deactivated", "\033[0m")
+	fmt.Println("\033[33m", " > 3. Suspended", "\033[0m")
+	fmt.Println("\033[33m", " > 4. Compromised", "\033[0m")
+	fmt.Println("\033[33m", " > 5. Destroyed", "\033[0m")
 	// fmt.Println("> 1. Enable")
 	// fmt.Println("> 2. Inherited")
 	fmt.Println("")

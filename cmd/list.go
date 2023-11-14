@@ -60,13 +60,13 @@ var listCmd = &cobra.Command{
 		fmt.Println("")
 
 		if choice == 1 {
-			err := lib.ListSecrets(userData.UserID)
+			_, err := lib.ListSecrets(userData.UserID)
 			if err != nil {
 				log.Fatalln("\033[31m", err.Error(), "\033[0m")
 			}
 
 		} else if choice == 2 {
-			err := lib.ListKeys(userData.UserID)
+			_, err := lib.ListKeys(userData.UserID)
 			if err != nil {
 				log.Fatalln("\033[31m", err.Error(), "\033[0m")
 			}

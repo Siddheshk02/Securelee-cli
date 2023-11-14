@@ -60,16 +60,24 @@ var updateCmd = &cobra.Command{
 		fmt.Println("")
 
 		if choice == 1 {
-			err := lib.ListSecrets(userData.UserID)
+			res, err := lib.ListSecrets(userData.UserID)
 			if err != nil {
 				log.Fatal("\033[31m", err, "\033[0m")
+			}
+			if res.Result.Count == 0 {
+				fmt.Print("\033[31m", "\n > No Secrets to Update.", "\033[0m")
+				fmt.Print("\033[33m", " Add a Secret using ", "\033[0m")
+				fmt.Print("\033[36m", "Securelee-cli create", "\033[0m")
+				fmt.Print("\033[33m", " command.\n", "\033[0m")
+				fmt.Println("")
+				return
 			}
 			var id string
 			fmt.Print("\033[33m", " > Enter the ID of the Secret to be Updated : ", "\033[0m")
 			fmt.Scan(&id)
 			if id == "" {
 				fmt.Println("\033[31m", "\n > ID cannot be empty. Please try again.", "\033[0m")
-				os.Exit(0)
+				return
 			}
 
 			err = lib.Update(id, "Secret")
@@ -78,9 +86,17 @@ var updateCmd = &cobra.Command{
 			}
 
 		} else if choice == 2 {
-			err := lib.ListKeys(userData.UserID)
+			res, err := lib.ListKeys(userData.UserID)
 			if err != nil {
 				log.Fatal("\033[31m", err, "\033[0m")
+			}
+			if res.Result.Count == 0 {
+				fmt.Print("\033[31m", "\n > No Keys to Update.", "\033[0m")
+				fmt.Print("\033[33m", " Add or Generate a Key using ", "\033[0m")
+				fmt.Print("\033[36m", "Securelee-cli create", "\033[0m")
+				fmt.Print("\033[33m", " command.\n", "\033[0m")
+				fmt.Println("")
+				return
 			}
 			var id string
 			fmt.Print("\033[33m", " > Enter the ID of the Key to be Updated : ", "\033[0m")

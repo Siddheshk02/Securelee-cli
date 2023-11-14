@@ -38,7 +38,7 @@ var loginCmd = &cobra.Command{
 		if res == true {
 			fmt.Fprintf(out, "\n%s > Already logged in! Use %s", cyan, reset)
 			fmt.Fprintf(out, "%s Securelee-cli whoami%s", yellow, reset)
-			fmt.Fprintf(out, "%s command to get the current logged in user.%s", cyan, reset)
+			fmt.Fprintf(out, "%s command to get the current logged in user.%s\n", cyan, reset)
 			fmt.Println("")
 			os.Exit(0)
 		}
@@ -79,11 +79,13 @@ var loginCmd = &cobra.Command{
 
 			if token == "" {
 				fmt.Fprintf(out, "%s > Invalid Token. Please try again.%s", red, reset)
+				return
 			}
 
 			result, ch = lib.CheckToken(token)
 			if ch != "" {
 				fmt.Println("\n", ch)
+				return
 			}
 
 		} else if choice == 2 {
@@ -150,20 +152,20 @@ var loginCmd = &cobra.Command{
 		// }
 
 		if choice == 1 {
-			fmt.Fprintf(out, "\n%s > Successfully Logged in as :%s", cyan, reset)
-			// fmt.Fprintf(out, info.Name)       , " (", info.Email, ")", "\033[0m")
-			fmt.Print(info.Name, info.Email)
+			// fmt.Fprintf(out, "\n%s > Successfully Logged in as :%s", cyan, reset)
+			fmt.Println("\033[36m", "\n > Successfully Logged in as ", info.Name, " (", info.Email, ")\n", "\033[0m")
+			// fmt.Print(info.Name, info.Email)
 			fmt.Println("")
 		} else if choice == 2 {
 			if usertype == "Old User" {
-				fmt.Fprintf(out, "\n%s > Successfully Logged in as :%s", cyan, reset)
-				// fmt.Println("\033[36m", "\n > Successfully Logged in as ", info.Name, " (", info.Email, ")", "\033[0m")
-				fmt.Print(info.Name, info.Email)
+				// fmt.Fprintf(out, "\n%s > Successfully Logged in as :%s", cyan, reset)
+				fmt.Println("\033[36m", "\n > Successfully Logged in as ", info.Name, " (", info.Email, ")\n", "\033[0m")
+				// fmt.Print(info.Name, info.Email)
 				fmt.Println("")
 			} else if usertype == "New User" {
-				fmt.Fprintf(out, "\n%s > Successfully Created and Logged in as :%s", cyan, reset)
-				// fmt.Println("\033[36m", "\n > Successfully Created and Logged in as ", info.Name, " (", info.Email, ")", "\033[0m")
-				fmt.Print(info.Name, info.Email)
+				// fmt.Fprintf(out, "\n%s > Successfully Created and Logged in as :%s", cyan, reset)
+				fmt.Println("\033[36m", "\n > Successfully Created and Logged in as ", info.Name, " (", info.Email, ")\n", "\033[0m")
+				// fmt.Print(info.Name, info.Email)
 				fmt.Println("")
 			}
 		}
