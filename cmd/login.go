@@ -28,8 +28,9 @@ var loginCmd = &cobra.Command{
 
 		res := lib.Check()
 		if res == true {
-			fmt.Println("\033[36m", "\n > Already logged in!", "\033[0m")
-			// fmt.Println("\n> Already logged in!")
+			fmt.Print("\033[36m", "\n > Already logged in! Use", "\033[0m")
+			fmt.Print("\033[33m", " Securelee-cli whoami", "\033[0m")
+			fmt.Println("\033[36m", "command to get the current logged in user.", "\033[0m")
 			fmt.Println("")
 			os.Exit(0)
 		}

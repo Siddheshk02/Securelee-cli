@@ -8,7 +8,6 @@ import (
 	"os"
 
 	"github.com/Siddheshk02/Securelee-cli/lib"
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -22,10 +21,10 @@ var logoutCmd = &cobra.Command{
 		err := lib.Logout()
 		if err != nil {
 			// log.Fatal(err, "Error, Please try again.")
-			color.Red("\033[31m", "\n > Error, Please try Again\n", "\033[0m")
+			fmt.Print("\033[31m", "\n > Error, Please try Again\n", "\033[0m")
 			os.Exit(0)
 		}
-		color.Cyan("\033[36m", "\n > Successfully Logged out!!\n", "\033[0m")
+		fmt.Println("\033[36m", "\n > Successfully Logged out!!\n", "\033[0m")
 		fmt.Println("")
 	},
 }
