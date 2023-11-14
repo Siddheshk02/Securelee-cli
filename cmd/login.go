@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/Siddheshk02/Securelee-cli/lib"
-	"github.com/Siddheshk02/Securelee-cli/mailing"
 	"github.com/pangeacyber/pangea-go/pangea-sdk/v2/service/authn"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
@@ -136,10 +135,10 @@ var loginCmd = &cobra.Command{
 			Expiry:  parsedTime,
 		}
 
-		err = mailing.SendMail(info.Name, info.Email)
-		if err != nil {
-			log.Fatalln("\033[31m", err.Error(), "\033[0m")
-		}
+		// err = mailing.SendMail(info.Name, info.Email)
+		// if err != nil {
+		// 	log.Fatalln("\033[31m", err.Error(), "\033[0m")
+		// }
 
 		if choice == 1 {
 			fmt.Println("\033[36m", "\n > Successfully Logged in as ", info.Name, " (", info.Email, ")", "\033[0m")

@@ -15,7 +15,7 @@ var versionCmd = &cobra.Command{
 	Short: "Version of the Securelee CLI.",
 	Long:  `Version of the Securelee CLI.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("\033[36m", "\n > Securelee - v1.0.0", "\033[0m")
+		fmt.Println("\033[36m", "\n > Securelee - v0.1.1", "\033[0m")
 		fmt.Print("\n")
 	},
 }
