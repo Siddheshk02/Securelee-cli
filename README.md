@@ -6,7 +6,6 @@
 
 A Open Source CLI tool built using Golang and Pangea for Storing and Managing Sensitive secrets and Keys.
 
-![image](https://github.com/Siddheshk02/Securelee/assets/90148705/fbbc1627-46ec-4816-9460-28a9b4fa04f5)
 
 ## 💻 Tech Stack :
 - [Golang](https://go.dev/)
