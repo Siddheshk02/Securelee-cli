@@ -1,4 +1,4 @@
-# Securelee Vault🔐
+# Securelee Vault 🔑🔐
 
 ![](https://img.shields.io/github/license/Siddheshk02/Securelee-cli?style=plastic)
 ![](https://img.shields.io/github/go-mod/go-version/Siddheshk02/Securelee-cli)
