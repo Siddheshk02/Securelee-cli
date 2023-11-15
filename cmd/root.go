@@ -14,7 +14,7 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "Securelee-cli",
-	Version: "v0.0.3",
+	Version: "v0.2.1",
 	Short:   "\nA CLI based Vault App for storing your Secret Messages or Keys Securely.",
 	Long:    `A CLI based Vault App for storing your Secret Messages or Keys Securely.`,
 	// Uncomment the following line if your bare application
@@ -28,7 +28,7 @@ var rootCmd = &cobra.Command{
 
 		renderStr, _ := ascii.RenderOpts("Securelee.", options)
 		fmt.Print(renderStr)
-		fmt.Print(" > v0.0.3")
+		fmt.Print(" > v0.2.1")
 	},
 }
 
