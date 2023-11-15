@@ -109,7 +109,7 @@ var loginCmd = &cobra.Command{
 			if token == "" && usertype == "" && err != nil {
 				log.Fatalf(err.Error())
 			} else if token == "" && usertype != "" && err == nil {
-				fmt.Println("\n > ", usertype)
+				fmt.Println("\033[31m", "\n > ", usertype, "\033[0m")
 				fmt.Println("")
 				return
 			}
@@ -153,18 +153,18 @@ var loginCmd = &cobra.Command{
 
 		if choice == 1 {
 			// fmt.Fprintf(out, "\n%s > Successfully Logged in as :%s", cyan, reset)
-			fmt.Println("\033[36m", "\n > Successfully Logged in as ", info.Name, " (", info.Email, ")\n", "\033[0m")
+			fmt.Println("\033[36m", "\n > Successfully Logged in as ", info.Name, " (", info.Email, ")", "\033[0m")
 			// fmt.Print(info.Name, info.Email)
 			fmt.Println("")
 		} else if choice == 2 {
 			if usertype == "Old User" {
 				// fmt.Fprintf(out, "\n%s > Successfully Logged in as :%s", cyan, reset)
-				fmt.Println("\033[36m", "\n > Successfully Logged in as ", info.Name, " (", info.Email, ")\n", "\033[0m")
+				fmt.Println("\033[36m", "\n > Successfully Logged in as ", info.Name, " (", info.Email, ")", "\033[0m")
 				// fmt.Print(info.Name, info.Email)
 				fmt.Println("")
 			} else if usertype == "New User" {
 				// fmt.Fprintf(out, "\n%s > Successfully Created and Logged in as :%s", cyan, reset)
-				fmt.Println("\033[36m", "\n > Successfully Created and Logged in as ", info.Name, " (", info.Email, ")\n", "\033[0m")
+				fmt.Println("\033[36m", "\n > Successfully Created and Logged in as ", info.Name, " (", info.Email, ")", "\033[0m")
 				// fmt.Print(info.Name, info.Email)
 				fmt.Println("")
 			}

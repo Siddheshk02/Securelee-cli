@@ -20,7 +20,7 @@ func Create(ID string) error {
 	var choice int
 	fmt.Print("\033[33m", "\n Select any one option: \n", "\033[0m")
 	fmt.Println("\033[33m", "\n > 1. Store a Secret Message", "\033[0m")
-	fmt.Println("\033[33m", " > 2. Create or Store a Key", "\033[0m")
+	fmt.Println("\033[33m", "> 2. Create or Store a Key", "\033[0m")
 	fmt.Println("")
 	fmt.Print("\033[36m", " > Enter your choice (for e.g. 1): ", "\033[0m")
 	fmt.Scanf("%d", &choice)
@@ -123,7 +123,7 @@ func StoreKey(folder string) (string, error, int) {
 	var choice int
 	fmt.Print("\033[33m", "\n Select any one option: \n", "\033[0m")
 	fmt.Println("\033[33m", "\n > 1. Import a Key", "\033[0m")
-	fmt.Println("\033[33m", " > 2. Generate a Key", "\033[0m")
+	fmt.Println("\033[33m", "> 2. Generate a Key", "\033[0m")
 	// fmt.Println("")
 	fmt.Print("\033[36m", "\n > Enter your choice (for e.g. 1): ", "\033[0m")
 	fmt.Scan(&choice)
@@ -141,7 +141,7 @@ func StoreKey(folder string) (string, error, int) {
 		var choice2 int
 		fmt.Println("\033[33m", "\n Select the Key type: ", "\033[0m")
 		fmt.Println("\033[33m", "\n > 1. Asymmetric Key", "\033[0m")
-		fmt.Println("\033[33m", " > 2. Symmetric Key", "\033[0m")
+		fmt.Println("\033[33m", "> 2. Symmetric Key", "\033[0m")
 		fmt.Println("")
 		fmt.Print("\033[36m", " > Enter your choice (for e.g. 1): ", "\033[0m")
 		// fmt.Scanf("%d", &choice2)
@@ -285,7 +285,7 @@ func StoreKey(folder string) (string, error, int) {
 		var choice2 int
 		fmt.Println("\033[33m", "\n Select the Key type: ", "\033[0m")
 		fmt.Println("\033[33m", "\n > 1. Asymmetric Key", "\033[0m")
-		fmt.Println("\033[33m", " > 2. Symmetric Key", "\033[0m")
+		fmt.Println("\033[33m", "> 2. Symmetric Key", "\033[0m")
 		fmt.Println("")
 		fmt.Print("\033[36m", " > Enter your choice (for e.g. 1): ", "\033[0m")
 		// fmt.Scanf("%d", &choice2)
@@ -482,10 +482,10 @@ func Update(id string, req string) error {
 
 	fmt.Println("\033[33m", "\n Select the Item State for the", req, ": ", "\033[0m")
 	fmt.Println("\033[33m", "\n > 1. Active", "\033[0m")
-	fmt.Println("\033[33m", " > 2. Deactivated", "\033[0m")
-	fmt.Println("\033[33m", " > 3. Suspended", "\033[0m")
-	fmt.Println("\033[33m", " > 4. Compromised", "\033[0m")
-	fmt.Println("\033[33m", " > 5. Destroyed", "\033[0m")
+	fmt.Println("\033[33m", "> 2. Deactivated", "\033[0m")
+	fmt.Println("\033[33m", "> 3. Suspended", "\033[0m")
+	fmt.Println("\033[33m", "> 4. Compromised", "\033[0m")
+	fmt.Println("\033[33m", "> 5. Destroyed", "\033[0m")
 	// fmt.Println("> 1. Enable")
 	// fmt.Println("> 2. Inherited")
 	fmt.Println("")

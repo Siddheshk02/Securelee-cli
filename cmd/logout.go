@@ -24,7 +24,7 @@ var logoutCmd = &cobra.Command{
 			fmt.Print("\033[31m", "\n > Error, Please try Again\n", "\033[0m")
 			os.Exit(0)
 		}
-		fmt.Println("\033[36m", "\n > Successfully Logged out!!\n", "\033[0m")
+		fmt.Println("\033[36m", "\n > Successfully Logged out!!", "\033[0m")
 		fmt.Println("")
 	},
 }

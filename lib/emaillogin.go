@@ -43,7 +43,7 @@ func LoginWithPass(Email string, Password string) (*authn.UserLoginResult, strin
 			parts := strings.Split(apiError.Summary, ".")
 
 			if len(parts) >= 3 {
-				result := strings.TrimSpace(parts[2])
+				result := strings.TrimSpace(parts[3])
 				return nil, result, nil
 			}
 		}
