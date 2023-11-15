@@ -15,7 +15,7 @@ A Open Source CLI tool built using Golang and Pangea for Storing and Managing Se
 ## 🛠️ Installation :
 
 ### Requirements : 
-- Golang ( version >= 1.19.3 )  [Installation Guide](https://golangdocs.com/install-go-windows)
+- Golang ( version >= 1.20 )  [Installation Guide](https://golangdocs.com/install-go-windows)
 
 
  Run this command to install Securelee :
