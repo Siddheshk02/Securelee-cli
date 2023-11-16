@@ -1,6 +1,6 @@
 # Securelee Vault
 
-![](https://img.shields.io/github/license/Siddheshk02/Securelee-cli)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![](https://img.shields.io/github/go-mod/go-version/Siddheshk02/Securelee-cli)
 ![](https://img.shields.io/github/downloads-pre/Siddheshk02/Securelee-cli/v1.0.5/total)
 
