@@ -13,6 +13,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/Siddheshk02/Securelee-cli/lib"
@@ -26,7 +27,6 @@ var getCmd = &cobra.Command{
 	Short: "Get a Particular Secret or Key.",
 	Long:  `Get a Particular Secret or Key.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// fmt.Println("get called")
 		res := lib.Check()
 		if !res {
 			fmt.Print("\033[31m", "\n > No User logged in, You must Login to use Securelee Vault Services.\n", "\033[0m")
@@ -48,6 +48,7 @@ var getCmd = &cobra.Command{
 
 		var userData struct {
 			UserID string `json:"userID"`
+			Email  string `json:"email"`
 		}
 		err = json.Unmarshal(jsonData, &userData)
 		if err != nil {
@@ -90,8 +91,10 @@ var getCmd = &cobra.Command{
 			}
 
 		}
-		folderKey := "/" + userData.UserID + "/keys/"
-		folderSecret := "/" + userData.UserID + "/secrets/"
+		email := strings.Replace(userData.Email, "@", "-", -1)
+		Newemail := strings.Replace(email, ".", "-", -1)
+		folderKey := "/" + Newemail + "/keys/"
+		folderSecret := "/" + Newemail + "/secrets/"
 
 		if resp != nil && *resp.Status == "Success" {
 			if resp.Result.Folder != folderKey {

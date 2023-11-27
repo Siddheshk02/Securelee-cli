@@ -22,7 +22,6 @@ var whoamiCmd = &cobra.Command{
 	Short: "The Current User of Securelee Vault.",
 	Long:  `The Current User of Securelee Vault.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// fmt.Println("whoami called")
 		res := lib.Check()
 		if !res {
 			fmt.Print("\033[31m", "\n > No User logged in, You must Login to use Securelee Vault Services.\n", "\033[0m")

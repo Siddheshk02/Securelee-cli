@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"strings"
 
 	"github.com/Siddheshk02/Securelee-cli/lib"
 	"github.com/spf13/cobra"
@@ -22,7 +23,6 @@ var updateCmd = &cobra.Command{
 	Short: "Update or Modify a Secret Message or Key.",
 	Long:  `Update or Modify a Secret Message or Key.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// fmt.Println("update called")
 		res := lib.Check()
 		if !res {
 			fmt.Print("\033[31m", "\n > No User logged in, You must Login to use Securelee Vault Services.\n", "\033[0m")
@@ -44,11 +44,14 @@ var updateCmd = &cobra.Command{
 
 		var userData struct {
 			UserID string `json:"userID"`
+			Email  string `json:"email"`
 		}
 		err = json.Unmarshal(jsonData, &userData)
 		if err != nil {
 			log.Fatal("\033[31m", err, "\033[0m")
 		}
+		email := strings.Replace(userData.Email, "@", "-", -1)
+		Newemail := strings.Replace(email, ".", "-", -1)
 
 		var choice uint
 		fmt.Print("\033[33m", "\n Select any one option: \n", "\033[0m")
@@ -60,7 +63,7 @@ var updateCmd = &cobra.Command{
 		fmt.Println("")
 
 		if choice == 1 {
-			res, err := lib.ListSecrets(userData.UserID)
+			res, err := lib.ListSecrets(Newemail)
 			if err != nil {
 				log.Fatal("\033[31m", err, "\033[0m")
 			}
@@ -86,7 +89,7 @@ var updateCmd = &cobra.Command{
 			}
 
 		} else if choice == 2 {
-			res, err := lib.ListKeys(userData.UserID)
+			res, err := lib.ListKeys(Newemail)
 			if err != nil {
 				log.Fatal("\033[31m", err, "\033[0m")
 			}

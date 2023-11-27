@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"strings"
 
 	"github.com/Siddheshk02/Securelee-cli/lib"
 	"github.com/spf13/cobra"
@@ -43,13 +44,17 @@ var createCmd = &cobra.Command{
 
 		var userData struct {
 			UserID string `json:"userID"`
+			Email  string `json:"email"`
 		}
 		err = json.Unmarshal(jsonData, &userData)
 		if err != nil {
 			log.Fatalln("\033[31m", err.Error(), "\033[0m")
 		}
+		email := strings.Replace(userData.Email, "@", "-", -1)
+		Newemail := strings.Replace(email, ".", "-", -1)
+		fmt.Println(Newemail)
 
-		err = lib.Create(userData.UserID)
+		err = lib.Create(Newemail)
 		if err != nil {
 			log.Fatalln("\033[31m", err.Error(), "\033[0m")
 		}

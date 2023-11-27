@@ -16,7 +16,7 @@ import (
 	"github.com/pangeacyber/pangea-go/pangea-sdk/v2/service/vault"
 )
 
-func Create(ID string) error {
+func Create(Email string) error {
 	var choice int
 	fmt.Print("\033[33m", "\n Select any one option: \n", "\033[0m")
 	fmt.Println("\033[33m", "\n > 1. Store a Secret Message", "\033[0m")
@@ -37,7 +37,7 @@ func Create(ID string) error {
 		os.Exit(0)
 	}
 
-	foldername := "/" + ID
+	foldername := "/" + Email
 
 	ctx, cancelFn := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancelFn()
@@ -49,9 +49,7 @@ func Create(ID string) error {
 	}
 
 	_, _ = client.FolderCreate(ctx, input)
-	// if err != nil {
-	// 	continue
-	// }
+
 	folder := foldername + "/" + str
 
 	if choice == 1 {
@@ -65,7 +63,6 @@ func Create(ID string) error {
 		fmt.Scan(&secretname)
 
 		fmt.Println("")
-		// time.Sleep(15 * time.Second)
 
 		input := &vault.SecretStoreRequest{
 			CommonStoreRequest: vault.CommonStoreRequest{
@@ -124,15 +121,9 @@ func StoreKey(folder string) (string, error, int) {
 	fmt.Print("\033[33m", "\n Select any one option: \n", "\033[0m")
 	fmt.Println("\033[33m", "\n > 1. Import a Key", "\033[0m")
 	fmt.Println("\033[33m", "> 2. Generate a Key", "\033[0m")
-	// fmt.Println("")
 	fmt.Print("\033[36m", "\n > Enter your choice (for e.g. 1): ", "\033[0m")
 	fmt.Scan(&choice)
-	// _, err := fmt.Scanf("%d", &choice)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 	fmt.Println("")
-	// fmt.Println(choice)
 
 	if choice == 1 {
 		ctx, cancelFn := context.WithTimeout(context.Background(), 60*time.Second)
@@ -144,7 +135,6 @@ func StoreKey(folder string) (string, error, int) {
 		fmt.Println("\033[33m", "> 2. Symmetric Key", "\033[0m")
 		fmt.Println("")
 		fmt.Print("\033[36m", " > Enter your choice (for e.g. 1): ", "\033[0m")
-		// fmt.Scanf("%d", &choice2)
 		fmt.Scan(&choice2)
 		fmt.Println("")
 
@@ -253,7 +243,7 @@ func StoreKey(folder string) (string, error, int) {
 				match := re.Find([]byte(err.Error()))
 
 				if match == nil {
-					return "", errors.New("No JSON data found in the error message"), choice
+					return "", errors.New("No JSON data found in the error message, Please try again"), choice
 				}
 
 				var apiError APIError
@@ -288,7 +278,6 @@ func StoreKey(folder string) (string, error, int) {
 		fmt.Println("\033[33m", "> 2. Symmetric Key", "\033[0m")
 		fmt.Println("")
 		fmt.Print("\033[36m", " > Enter your choice (for e.g. 1): ", "\033[0m")
-		// fmt.Scanf("%d", &choice2)
 		fmt.Scan(&choice2)
 		fmt.Println("")
 
@@ -355,7 +344,7 @@ func StoreKey(folder string) (string, error, int) {
 	return "", nil, choice
 }
 
-func ListSecrets(UserId string) (*pangea.PangeaResponse[vault.ListResult], error) {
+func ListSecrets(Email string) (*pangea.PangeaResponse[vault.ListResult], error) {
 	ctx, cancelFn := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancelFn()
 	client := InitVault()
@@ -363,7 +352,7 @@ func ListSecrets(UserId string) (*pangea.PangeaResponse[vault.ListResult], error
 	resp, err := client.List(ctx,
 		&vault.ListRequest{
 			Filter: map[string]string{
-				"folder": "/" + UserId + "/secrets",
+				"folder": "/" + Email + "/secrets",
 			},
 		})
 
@@ -392,7 +381,7 @@ func ListSecrets(UserId string) (*pangea.PangeaResponse[vault.ListResult], error
 	return nil, nil
 }
 
-func ListKeys(UserId string) (*pangea.PangeaResponse[vault.ListResult], error) {
+func ListKeys(Email string) (*pangea.PangeaResponse[vault.ListResult], error) {
 	ctx, cancelFn := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancelFn()
 	client := InitVault()
@@ -400,7 +389,7 @@ func ListKeys(UserId string) (*pangea.PangeaResponse[vault.ListResult], error) {
 	resp, err := client.List(ctx,
 		&vault.ListRequest{
 			Filter: map[string]string{
-				"folder": "/" + UserId + "/keys",
+				"folder": "/" + Email + "/keys",
 			},
 		})
 
@@ -486,8 +475,6 @@ func Update(id string, req string) error {
 	fmt.Println("\033[33m", "> 3. Suspended", "\033[0m")
 	fmt.Println("\033[33m", "> 4. Compromised", "\033[0m")
 	fmt.Println("\033[33m", "> 5. Destroyed", "\033[0m")
-	// fmt.Println("> 1. Enable")
-	// fmt.Println("> 2. Inherited")
 	fmt.Println("")
 	fmt.Print("\033[36m", " > Enter your choice (for e.g. 1): ", "\033[0m")
 	fmt.Scan(&choice)

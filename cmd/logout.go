@@ -17,10 +17,8 @@ var logoutCmd = &cobra.Command{
 	Short: "Logout of Securelee Vault.",
 	Long:  `Logout of Securelee Vault.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// fmt.Println("logout called")
 		err := lib.Logout()
 		if err != nil {
-			// log.Fatal(err, "Error, Please try again.")
 			fmt.Print("\033[31m", "\n > Error, Please try Again\n", "\033[0m")
 			os.Exit(0)
 		}

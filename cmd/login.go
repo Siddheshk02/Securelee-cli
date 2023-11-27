@@ -56,26 +56,18 @@ var loginCmd = &cobra.Command{
 		fmt.Scanf("%d", &choice)
 		fmt.Println("")
 		if choice == 1 {
-			// c := color.New(color.FgCyan, color.Bold)
-			// var str any
 			fmt.Fprintf(out, "%s > Press Enter to Login using Browser%s", yellow, reset)
 			fmt.Fprintf(out, "%s  (You can get back to CLI after Successful Authentication) : %s", magenta, reset)
-			// fmt.Print("")
 
 			_, _ = term.ReadPassword(int(os.Stdin.Fd()))
 
-			// _, key, _ := keyboard.GetSingleKey()
 			fmt.Println("")
 
-			// Check if the key is Enter
-			// if key == keyboard.KeyEnter {
 			lib.Login()
 			time.Sleep(25 * time.Second)
 
 			fmt.Fprintf(out, "%s\n > Please Enter the Token from the Securelee Authentication Tab: %s", yellow, reset)
 			fmt.Scan(&token)
-			// time.Sleep()
-			// }
 
 			if token == "" {
 				fmt.Fprintf(out, "%s > Invalid Token. Please try again.%s", red, reset)
@@ -95,7 +87,7 @@ var loginCmd = &cobra.Command{
 			fmt.Println("")
 			fmt.Fprintf(out, "%s > Enter your Password %s", yellow, reset)
 			fmt.Fprintf(out, "\n%s  { Password must have \n   - at least 8 characters,\n   - at least 1 number characters,\n   - at least 1 special characters } : %s", magenta, reset)
-			// fmt.Scan(&password)
+
 			password, _ := term.ReadPassword(int(os.Stdin.Fd()))
 			fmt.Println("")
 			check := lib.IsValidPassword(string(password))
@@ -146,33 +138,21 @@ var loginCmd = &cobra.Command{
 			Expiry:  parsedTime,
 		}
 
-		// err = mailing.SendMail(info.Name, info.Email)
-		// if err != nil {
-		// 	log.Fatalln("\033[31m", err.Error(), "\033[0m")
-		// }
-
 		if choice == 1 {
-			// fmt.Fprintf(out, "\n%s > Successfully Logged in as :%s", cyan, reset)
 			fmt.Println("\033[36m", "\n > Successfully Logged in as ", info.Name, " (", info.Email, ")", "\033[0m")
-			// fmt.Print(info.Name, info.Email)
 			fmt.Println("")
 		} else if choice == 2 {
 			if usertype == "Old User" {
-				// fmt.Fprintf(out, "\n%s > Successfully Logged in as :%s", cyan, reset)
 				fmt.Println("\033[36m", "\n > Successfully Logged in as ", info.Name, " (", info.Email, ")", "\033[0m")
-				// fmt.Print(info.Name, info.Email)
 				fmt.Println("")
 			} else if usertype == "New User" {
-				// fmt.Fprintf(out, "\n%s > Successfully Created and Logged in as :%s", cyan, reset)
 				fmt.Println("\033[36m", "\n > Successfully Created and Logged in as ", info.Name, " (", info.Email, ")", "\033[0m")
-				// fmt.Print(info.Name, info.Email)
 				fmt.Println("")
 			}
 		}
 
 		currentUser, err := user.Current()
 		if err != nil {
-			// log.Fatal("\033[31m", " > Error occured!, try again.", "\033[0m")
 			fmt.Fprintf(out, "%s > Error occured!, try again.%s", red, reset)
 			return
 		}
@@ -180,7 +160,6 @@ var loginCmd = &cobra.Command{
 		path := currentUser.HomeDir + "/Securelee"
 		err = os.MkdirAll(path, os.ModePerm)
 		if err != nil {
-			// log.Fatal("\033[31m", "Error occured!, try again.", "\033[0m")
 			fmt.Fprintf(out, "%s > Error occured!, try again.%s", red, reset)
 			return
 		}

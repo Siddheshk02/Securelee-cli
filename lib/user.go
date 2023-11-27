@@ -84,9 +84,6 @@ func CheckToken(token string) (*authn.ClientTokenCheckResult, string) {
 	resp, err := client.Client.Token.Check(ctx, input)
 
 	if err != nil && resp == nil {
-		// log.Fatal(err, "Error, Please Try Again.")
-		// fmt.Println("\n > No User logged in, You must Login to use Securelee Vault Services.")
-		// os.Exit(0)
 		return nil, "No User"
 	}
 
@@ -125,7 +122,6 @@ func LoginWithEmail(Email string, Password string) (string, string, error) {
 		fmt.Println("")
 		fmt.Print("\033[33m", " > Enter your Last Name: ", "\033[0m")
 		fmt.Scan(&last)
-		// fmt.Println("")
 
 		profile := &authn.ProfileData{
 			"first_name": first,
@@ -144,7 +140,6 @@ func LoginWithEmail(Email string, Password string) (string, string, error) {
 		if err != nil || out == nil {
 			fmt.Println("\033[31m", "\nFailed to create a new user", "\033[0m")
 			os.Exit(0)
-			// log.Fatal(err)
 		}
 
 		//adding password for the user profile
@@ -164,8 +159,6 @@ func LoginWithEmail(Email string, Password string) (string, string, error) {
 	} else if result == nil && str != "" && err == nil {
 		return "", str, nil
 	}
-
-	// token := fmt.Sprintf("%s", result.ActiveToken.Token)
 
 	return result.ActiveToken.Token, usertype, nil
 
@@ -249,22 +242,18 @@ func NewUser(Email string) (string, error) {
 		match := re.Find([]byte(err.Error()))
 
 		if match == nil {
-			// log.Fatal("No JSON data found in the error message")
 			return "", errors.New("No JSON data found in the error message")
 		}
 
 		var apiError APIError
 		err = json.Unmarshal(match, &apiError)
 		if err != nil {
-			// log.Fatal("Error unmarshalling JSON:", err)
 			return "", err
 
 		}
 
 		return apiError.Status, nil
 	}
-
-	// fmt.Println(apiError.Status)
 
 	return *resp.Status, nil
 }

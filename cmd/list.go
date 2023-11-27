@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"strings"
 
 	"github.com/Siddheshk02/Securelee-cli/lib"
 	"github.com/spf13/cobra"
@@ -22,7 +23,6 @@ var listCmd = &cobra.Command{
 	Short: "Get all Secret Messages or Keys.",
 	Long:  `Get all Secret Messages or Keys.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// fmt.Println("list called")
 		res := lib.Check()
 		if !res {
 			fmt.Print("\033[31m", "\n > No User logged in, You must Login to use Securelee Vault Services.\n", "\033[0m")
@@ -44,11 +44,14 @@ var listCmd = &cobra.Command{
 
 		var userData struct {
 			UserID string `json:"userID"`
+			Email  string `json:"email"`
 		}
 		err = json.Unmarshal(jsonData, &userData)
 		if err != nil {
 			log.Fatalln("\033[31m", err.Error(), "\033[0m")
 		}
+		email := strings.Replace(userData.Email, "@", "-", -1)
+		Newemail := strings.Replace(email, ".", "-", -1)
 
 		var choice int
 		fmt.Print("\033[33m", "\n Select any one option: \n", "\033[0m")
@@ -60,25 +63,16 @@ var listCmd = &cobra.Command{
 		fmt.Println("")
 
 		if choice == 1 {
-			_, err := lib.ListSecrets(userData.UserID)
+			_, err := lib.ListSecrets(Newemail)
 			if err != nil {
 				log.Fatalln("\033[31m", err.Error(), "\033[0m")
 			}
 
 		} else if choice == 2 {
-			_, err := lib.ListKeys(userData.UserID)
+			_, err := lib.ListKeys(Newemail)
 			if err != nil {
 				log.Fatalln("\033[31m", err.Error(), "\033[0m")
 			}
-
-			// for i := 0; i < count; i++ {
-			// 	fmt.Println("\n> ", i+1, " id : ", lists[i].ID)
-			// 	fmt.Println("    Name : ", lists[i].Name)
-			// 	fmt.Println("    Type : ", lists[i].Type)
-			// 	fmt.Println("    Purpose : ", lists[i].Purpose)
-			// 	fmt.Println("    Algorithm : ", lists[i].Algorithm)
-			// }
-
 		} else {
 			fmt.Println("\033[31m", " > Invalid Choice Entered!!, Please try again", "\033[0m")
 			fmt.Println("")
