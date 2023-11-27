@@ -19,7 +19,7 @@ A Open Source CLI tool built using Golang and Pangea for Storing and Managing Se
 
  Run this command to install Securelee :
  ```
- go install github.com/Siddheshk02/Securelee-cli@v1.0.5
+ go install github.com/Siddheshk02/Securelee-cli@v1.1.6
  ```
  
  Start with Securelee :
