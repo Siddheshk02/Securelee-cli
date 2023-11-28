@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![](https://img.shields.io/github/go-mod/go-version/Siddheshk02/Securelee-cli)
-![](https://img.shields.io/github/downloads-pre/Siddheshk02/Securelee-cli/v1.0.5/total)
+![](https://img.shields.io/github/downloads-pre/Siddheshk02/Securelee-cli/v1.1.7/total)
 
 A Open Source CLI tool built using Golang and Pangea for Storing and Managing Sensitive secrets and Keys.
 
@@ -19,7 +19,7 @@ A Open Source CLI tool built using Golang and Pangea for Storing and Managing Se
 
  Run this command to install Securelee :
  ```
- go install github.com/Siddheshk02/Securelee-cli@v1.0.5
+ go install github.com/Siddheshk02/Securelee-cli@v1.1.7
  ```
  
  Start with Securelee :
