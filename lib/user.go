@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/pangeacyber/pangea-go/pangea-sdk/v2/service/authn"
 	"github.com/skratchdot/open-golang/open"
 )
@@ -106,7 +107,14 @@ func CheckToken(token string) (ResponseData, string) {
 		"token": token,
 	})
 
-	AuthToken := "Bearer " + "pts_xajlrac4we4mufoebqgejbrh2ieq72c4"
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("\033[31m", "Error loading .env file", "\033[0m")
+	}
+	// Get token
+	token1 := os.Getenv("PANGEA_VAULT_TOKEN")
+
+	AuthToken := "Bearer " + token1
 
 	client1 := &http.Client{}
 	req, _ := http.NewRequest(method, url, bytes.NewBuffer(payload))
@@ -231,7 +239,14 @@ func Logout() error {
 		"token": TokenData.Token,
 	})
 
-	AuthToken := "Bearer " + "pts_xajlrac4we4mufoebqgejbrh2ieq72c4"
+	err = godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("\033[31m", "Error loading .env file", "\033[0m")
+	}
+	// Get token
+	token1 := os.Getenv("PANGEA_VAULT_TOKEN")
+
+	AuthToken := "Bearer " + token1
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(payload))
@@ -278,7 +293,14 @@ func NewUser(Email string) (string, error) {
 		"email": Email,
 	})
 
-	AuthToken := "Bearer " + "pts_xajlrac4we4mufoebqgejbrh2ieq72c4"
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("\033[31m", "Error loading .env file", "\033[0m")
+	}
+	// Get token
+	token1 := os.Getenv("PANGEA_VAULT_TOKEN")
+
+	AuthToken := "Bearer " + token1
 
 	client1 := &http.Client{}
 	req, _ := http.NewRequest(method, url, bytes.NewBuffer(payload))
