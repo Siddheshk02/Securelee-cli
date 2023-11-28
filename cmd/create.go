@@ -52,7 +52,6 @@ var createCmd = &cobra.Command{
 		}
 		email := strings.Replace(userData.Email, "@", "-", -1)
 		Newemail := strings.Replace(email, ".", "-", -1)
-		fmt.Println(Newemail)
 
 		err = lib.Create(Newemail)
 		if err != nil {

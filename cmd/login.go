@@ -14,7 +14,6 @@ import (
 
 	"github.com/Siddheshk02/Securelee-cli/lib"
 	"github.com/mattn/go-colorable"
-	"github.com/pangeacyber/pangea-go/pangea-sdk/v2/service/authn"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 )
@@ -46,7 +45,7 @@ var loginCmd = &cobra.Command{
 		var choice int
 		var token string
 		var err error
-		var result *authn.ClientTokenCheckResult
+		var result lib.ResponseData
 		var ch, usertype string
 		fmt.Fprintf(out, "\n%s Select any one option: %s\n", yellow, reset)
 		fmt.Fprintf(out, "\n%s > 1. Login using Socials through Browser%s\n", yellow, reset)
@@ -96,10 +95,12 @@ var loginCmd = &cobra.Command{
 				return
 			}
 
-			token, usertype, err = lib.LoginWithEmail(email, string(password))
+			// token, usertype, err = lib.LoginWithEmail(email, string(password))
 
-			if token == "" && usertype == "" && err != nil {
-				log.Fatalf(err.Error())
+			if token == "" && usertype == "" && err == nil {
+				fmt.Println("\033[31m", "\n > Failed to Login! Please try another login method. \033[0m")
+				os.Exit(0)
+
 			} else if token == "" && usertype != "" && err == nil {
 				fmt.Println("\033[31m", "\n > ", usertype, "\033[0m")
 				fmt.Println("")
@@ -119,7 +120,7 @@ var loginCmd = &cobra.Command{
 			return
 		}
 
-		parsedTime, err := time.Parse(time.RFC3339, result.Expire)
+		parsedTime, err := time.Parse(time.RFC3339, result.Result.Expire)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
@@ -132,9 +133,9 @@ var loginCmd = &cobra.Command{
 			Expiry  time.Time `json:"expiry"`
 		}{
 			Token:   token,
-			Email:   result.Email,
-			Name:    result.Profile["first_name"] + " " + result.Profile["last_name"],
-			User_ID: result.ID,
+			Email:   result.Result.Email,
+			Name:    result.Result.Profile.FirstName + " " + result.Result.Profile.LastName,
+			User_ID: result.Result.ID,
 			Expiry:  parsedTime,
 		}
 

@@ -1,20 +1,19 @@
 package lib
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"os/user"
 	"path/filepath"
-	"regexp"
 	"time"
 
 	"github.com/pangeacyber/pangea-go/pangea-sdk/v2/service/authn"
-	"github.com/pangeacyber/pangea-go/pangea-sdk/v3/pangea"
 	"github.com/skratchdot/open-golang/open"
 )
 
@@ -71,28 +70,62 @@ func Check() bool {
 	return false
 }
 
+type ResponseData struct {
+	RequestID    string `json:"request_id"`
+	RequestTime  string `json:"request_time"`
+	ResponseTime string `json:"response_time"`
+	Status       string `json:"status"`
+	Result       ResultData
+}
+
+type ResultData struct {
+	ID        string `json:"id"`
+	Type      string `json:"type"`
+	Life      int    `json:"life"`
+	Expire    string `json:"expire"`
+	Identity  string `json:"identity"`
+	Email     string `json:"email"`
+	Profile   ProfileData
+	CreatedAt string `json:"created_at"`
+}
+
+type ProfileData struct {
+	LastLoginCity    string `json:"Last-Login-City"`
+	LastLoginCountry string `json:"Last-Login-Country"`
+	FirstName        string `json:"first_name"`
+	LastName         string `json:"last_name"`
+}
+
 // Check Token Validity
-func CheckToken(token string) (*authn.ClientTokenCheckResult, string) {
-	ctx, cancelFn := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancelFn()
-	client := Init()
+func CheckToken(token string) (ResponseData, string) {
 
-	input := authn.ClientTokenCheckRequest{
-		Token: token,
+	url := "https://authn.aws.us.pangea.cloud/v2/client/token/check"
+	method := "POST"
+
+	payload, _ := json.Marshal(map[string]string{
+		"token": token,
+	})
+
+	AuthToken := "Bearer " + "pts_xajlrac4we4mufoebqgejbrh2ieq72c4"
+
+	client1 := &http.Client{}
+	req, _ := http.NewRequest(method, url, bytes.NewBuffer(payload))
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Authorization", AuthToken)
+
+	res, _ := client1.Do(req)
+	defer res.Body.Close()
+
+	body, _ := ioutil.ReadAll(res.Body)
+
+	var responseData ResponseData
+	_ = json.Unmarshal(body, &responseData)
+
+	if responseData.Status == "Success" {
+		return responseData, ""
 	}
 
-	resp, err := client.Client.Token.Check(ctx, input)
-
-	if err != nil && resp == nil {
-		return nil, "No User"
-	}
-
-	if *resp.Status == "Success" {
-		return resp.Result, ""
-	}
-
-	return nil, "Invalid Token"
-
+	return ResponseData{}, "Invalid Token"
 }
 
 func FileExists(filename string) bool {
@@ -166,17 +199,13 @@ func LoginWithEmail(Email string, Password string) (string, string, error) {
 
 // Logout the Current User's Session
 func Logout() error {
-	res := Check()
-	if !res {
+	ref := Check()
+	if !ref {
 		fmt.Print("\033[31m", "\n > No User logged in, You must Login to use Securelee Vault Services.\n", "\033[0m")
 		fmt.Print("\033[36m", "\n > Use 'Securelee-cli login' command to complete the Authentication.\n", "\033[0m")
 		fmt.Println("")
 		os.Exit(0)
 	}
-
-	ctx, cancelFn := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancelFn()
-	client := Init()
 
 	user, err := user.Current()
 	if err != nil {
@@ -196,19 +225,32 @@ func Logout() error {
 		return err
 	}
 
-	token := TokenData.Token
+	url := "https://authn.aws.us.pangea.cloud/v2/client/session/logout"
+	method := "POST"
+	payload, _ := json.Marshal(map[string]string{
+		"token": TokenData.Token,
+	})
 
-	input := authn.ClientSessionLogoutRequest{
-		Token: token,
-	}
-	_, err = client.Client.Session.Logout(ctx, input)
+	AuthToken := "Bearer " + "pts_xajlrac4we4mufoebqgejbrh2ieq72c4"
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, bytes.NewBuffer(payload))
+
 	if err != nil {
-		// return err
-		fmt.Print("\033[31m", "\n > No User logged in, You must Login to use Securelee Vault Services.\n", "\033[0m")
-		fmt.Print("\033[36m", "\n > Use 'Securelee-cli login' command to complete the Authentication.\n", "\033[0m")
-		fmt.Println("")
+		fmt.Println("Error !!! Please Try Again.")
 		os.Exit(0)
 	}
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Authorization", AuthToken)
+
+	res, _ := client.Do(req)
+
+	defer res.Body.Close()
+
+	body, _ := ioutil.ReadAll(res.Body)
+
+	var responseData ResponseData
+	_ = json.Unmarshal(body, &responseData)
 
 	err = os.Remove(filePath)
 	if err != nil {
@@ -228,32 +270,28 @@ type APIError struct {
 }
 
 func NewUser(Email string) (string, error) {
-	ctx, cancelFn := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancelFn()
-	client := Init()
 
-	input := authn.UserProfileGetRequest{
-		Email: pangea.String(Email),
-	}
-	resp, err := client.User.Profile.Get(ctx, input)
+	url := "https://authn.aws.us.pangea.cloud/v2/user/profile/get"
+	method := "POST"
 
-	if resp == nil {
-		re := regexp.MustCompile(`\{[^{}]*\}`)
-		match := re.Find([]byte(err.Error()))
+	payload, _ := json.Marshal(map[string]string{
+		"email": Email,
+	})
 
-		if match == nil {
-			return "", errors.New("No JSON data found in the error message")
-		}
+	AuthToken := "Bearer " + "pts_xajlrac4we4mufoebqgejbrh2ieq72c4"
 
-		var apiError APIError
-		err = json.Unmarshal(match, &apiError)
-		if err != nil {
-			return "", err
+	client1 := &http.Client{}
+	req, _ := http.NewRequest(method, url, bytes.NewBuffer(payload))
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Authorization", AuthToken)
 
-		}
+	res, _ := client1.Do(req)
+	defer res.Body.Close()
 
-		return apiError.Status, nil
-	}
+	body, _ := ioutil.ReadAll(res.Body)
 
-	return *resp.Status, nil
+	var responseData ResponseData
+	_ = json.Unmarshal(body, &responseData)
+
+	return responseData.Status, nil
 }
